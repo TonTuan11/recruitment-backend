@@ -1,0 +1,75 @@
+server:
+  port: 5002
+
+spring:
+  application:
+    name: application-service
+
+  config:
+    import: "optional:configserver:"  # use service id
+   #import: "optional:configserver:http://localhost:8888"   #   use localhost
+
+
+  #config-server
+  cloud:
+    config:
+      discovery:
+        enabled: true   #Enable discovery to find Config Server in Eureka.
+        service-id: config-server
+      name: spring-mvc,datasource-db,kafka,timezone
+
+    openfeign:
+      circuitbreaker:
+        enabled: true
+
+  #database
+  datasource:
+    #url: "jdbc:mysql://localhost:2003/application_service"
+    url: "jdbc:mysql://application-db:3306/application_service"     #using docker container
+    driverClassName: "com.mysql.cj.jdbc.Driver"
+    username: root
+    password: applicationservice
+
+
+#Eureka
+eureka:
+  instance:
+    prefer-ip-address: true   # Use IP address instead of hostname
+    instance-id: ${spring.application.name}:${server.port}
+  client:
+    service-url:
+      #defaultZone: http://localhost:8762/eureka/   # register on Eureka
+      defaultZone: http://eureka-server:8762/eureka/   # using docker container
+
+
+#fallback
+resilience4j:
+  circuitbreaker:
+    instances:
+      USER-SERVICE:
+        sliding-window-size: 6
+        minimum-number-of-calls: 2
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 20s
+        permitted-number-of-calls-in-half-open-state: 1
+
+      JOB-SERVICE:
+        sliding-window-size: 6
+        minimum-number-of-calls: 2
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 20s
+        permitted-number-of-calls-in-half-open-state: 1
+
+  timelimiter:
+    instances:
+      USER-SERVICE:
+        timeout-duration: 3s
+      JOB-SERVICE:
+        timeout-duration: 3s
+
+
+#cloudinary
+#cloudinary:
+#  cloud-name: dd1kwmoqe
+#  api-key: 685652358234613
+#  api-secret: ng1k-z6fiHScvtSU2sEUZZdcWpw

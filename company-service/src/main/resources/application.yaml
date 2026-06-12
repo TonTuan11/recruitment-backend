@@ -1,0 +1,43 @@
+server:
+  port: 5003
+
+spring:
+  application:
+    name: company-service
+
+  config:
+    import: "optional:configserver:"       # use service id
+    #import: "optional:configserver:http://localhost:8888"   #  use localhost
+
+
+  # Use the Config Server name registered in Eureka instead of localhost.
+  cloud:
+    config:
+      discovery:
+        enabled: true   #Enable discovery to find Config Server via Eureka.
+        service-id: config-server
+      name: datasource-db,spring-mvc,kafka,timezone    # Import required config file
+
+
+
+
+#databae
+  datasource:
+    url: "jdbc:mysql://company-db:3306/company_service"
+    driverClassName: "com.mysql.cj.jdbc.Driver"
+    username: root
+    password: companyservice
+
+
+
+
+#Eureka
+eureka:
+  instance:
+    prefer-ip-address: true   # Use IP address instead of hostname
+    instance-id: ${spring.application.name}:${server.port}
+  client:
+    service-url:
+      #defaultZone: http://localhost:8762/eureka/   # register on Eureka
+      defaultZone: http://eureka-server:8762/eureka/   # using docker
+

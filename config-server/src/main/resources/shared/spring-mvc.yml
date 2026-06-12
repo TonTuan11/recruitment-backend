@@ -1,0 +1,7 @@
+#Spring MVC: WEB & MVC
+spring:
+  mvc:
+    throw-exception-if-no-handler-found: true  # force  Spring throw exception NoHandlerFoundException
+  web:
+    resources:
+      add-mappings: false    # disable static resource handler (static: /html, /css)

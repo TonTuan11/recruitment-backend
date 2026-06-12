@@ -1,0 +1,95 @@
+# JWT
+jwt:
+  signerKey: "77D09NocEMSCaWDllpOWfkkG46xpcOccxGt0eHn90MJ1AT7lZ7u+qwFaOjaAUips"
+  valid-duration: 3600
+  refreshable-duration: 86400
+
+#Eureka
+#eureka:
+#  instance:
+#    prefer-ip-address: true   # Use IP address instead of hostname
+#    instance-id: ${spring.application.name}:${server.port}
+#  client:
+#    service-url:
+#      defaultZone: http://localhost:8762/eureka/   # register on Eureka
+#
+
+
+#management:
+#  tracing:
+#    sampling:
+#      probability: 1.0
+#  zipkin:
+#    tracing:
+#      endpoint: "http://localhost:9411/api/v2/spans"
+#  observations:
+#    key-values:
+#      application: ${spring.application.name}
+
+
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+    propagation:
+      type: W3C # Chuẩn truyền Trace ID hiện đại cho Spring Boot 3
+
+  zipkin:
+    tracing:
+      #endpoint: "http://localhost:9411/api/v2/spans"   #using local
+      endpoint: "http://zipkin:9411/api/v2/spans"    #using docker container
+
+  observations:
+    key-values:
+      application: ${spring.application.name}
+
+
+logging:
+  pattern:
+    level: "%5p [${spring.application.name},%X{traceId:-},%X{spanId:-}]"
+
+
+# Resilience4j
+#resilience4j:
+#  circuitbreaker:
+#    configs:
+#      default:
+#        sliding-window-type: COUNT_BASED # tính theo số lượng request
+#        sliding-window-size: 6 # Tính toán dựa trên số request gần nhất
+#        minimum-number-of-calls: 2 # điểu kiện để tính: phải có ít nhất: số reuqest mới tính toán
+#        failure-rate-threshold: 50    # 1/2 cái lỗi là ngắt mạch
+#        wait-duration-in-open-state: 20s # thời gian chờ để test lại
+#        permitted-number-of-calls-in-half-open-state: 1
+#
+#    instances:
+#      userServiceCB:
+#        base-config: default
+#      postServiceCB:
+#        base-config: default
+#      feedServiceCB:
+#        base-config: default
+#
+#  timelimiter:
+#    configs:
+#      default:
+#        timeout-duration: 3s
+#    instances:
+#      userServiceCB:
+#        base-config: default
+#      postServiceCB:
+#        base-config: default
+#      feedServiceCB:
+#        base-config: default
+#
+
+# LOGGING
+#logging:
+#  level:
+   # org.springframework.web.security.handler: TRACE
+   # org.springframework.web.servlet.resource: TRACE
+   # org.springframework.security: DEBUG
+   # io.github.resilience4j.circuitbreaker: DEBUG
+#    pattern:
+#      level: "%5p [${spring.application.name},%X{traceId:-},%X{spanId:-}]"
+
+

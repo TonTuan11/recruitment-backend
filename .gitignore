@@ -1,0 +1,106 @@
+# Compiled Java
+*.class
+
+# Log files
+*.log
+*.logs
+
+# Package files
+*.jar
+*.war
+*.nar
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# Maven
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+
+# Eclipse / IntelliJ / NetBeans
+.idea/
+*.iml
+*.iws
+*.ipr
+.classpath
+.project
+.settings/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS generated
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+
+# Node / React (frontend)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+build/
+dist/
+.env
+.env.local
+.env.*.local
+.eslintcache
+*.tsbuildinfo
+
+# Docker
+docker-compose.override.yml
+*.pid
+*.pid.lock
+
+# Spring Boot configuration overrides (local)
+application-local.properties
+application-dev.properties
+application-prod.properties
+bootstrap-local.yml
+bootstrap-dev.yml
+
+# Common lib (build output)
+common-lib/target/
+
+# Service specific logs
+**/logs/
+**/log/
+
+# Media uploads (if any local uploads)
+uploads/
+temp/
+*.tmp
+
+# Git
+*.orig
+*.rej
+
+# Testing
+test-output/
+surefire-reports/
+**/target/surefire-reports/
+
+# IDE specific
+.idea/workspace.xml
+.idea/tasks.xml
+.idea/dataSources/
+.idea/dataSources.local.xml
+.idea/shelf/
+.idea/httpRequests/
+*.hprof
