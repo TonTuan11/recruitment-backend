@@ -170,7 +170,8 @@ public class CompanyService {
 
 
 
-    public Page<CompanyResponse> getActiveCompanies(Pageable pageable, String keyword) {
+    public Page<CompanyResponse> getActiveCompanies(Pageable pageable, String keyword)
+    {
         Page<Company> page;
         if (keyword != null && !keyword.isEmpty())
         {
@@ -197,16 +198,30 @@ public class CompanyService {
         return page.map(companyMapper::toResponse);
     }
 
-    public void restoreCompany(Long id) {
+    public void restoreCompany(Long id)
+    {
         Company company = companyRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.COMPANY_NOT_FOUND));
         company.setIsDeleted(false);
         companyRepository.save(company);
+
+        // Publish event
+        CompanyEvent event = new CompanyEvent();
+        event.setEventId(UUID.randomUUID().toString());
+        event.setEventType("RESTORE");
+        event.setSource("company-service");
+        event.setCompanyId(company.getId());
+        event.setCompanyName(company.getName());
+        event.setAction("RESTORE");
+
+        kafkaTemplate.send(CompanyEvent.TOPIC, event);
+        log.info("Published RESTORE  event for company: {}", company.getId());
     }
 
 
 
-    public void softDeleteCompany(Long id) {
+    public void softDeleteCompany(Long id)
+    {
         Company company = companyRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.COMPANY_NOT_FOUND));
 
@@ -290,11 +305,13 @@ public class CompanyService {
 //    }
 
     @KafkaListener(topics = UserEvent.TOPIC, groupId ="company-service-group" )
-    public void handleUserEvent(UserEvent event) {
+    public void handleUserEvent(UserEvent event)
+    {
         log.info("Company Service received UserEvent: Action={}, UserId={}, CompanyId={}",
                 event.getAction(), event.getUserId(), event.getCompanyId());
 
-        switch (event.getAction()) {
+        switch (event.getAction())
+        {
             case "SOFT_DELETED":
                 if (event.getCompanyId() != null)
                 {
@@ -302,6 +319,7 @@ public class CompanyService {
                     log.info("Company {} soft deleted via user event", event.getCompanyId());
                 }
                 break;
+
             case "HARD_DELETED":
                 if (event.getCompanyId() != null)
                 {
@@ -316,6 +334,7 @@ public class CompanyService {
                 log.info("New user created: {}", event.getUserId());
                 break;
 
+
             case "UPDATE":
                 if (event.getCompanyId() == null || event.getEmail() == null) break;
 
@@ -326,6 +345,16 @@ public class CompanyService {
                     companyRepository.save(company);
                 }
                 break;
+
+            case "RESTORE":
+                if (event.getCompanyId() != null)
+                {
+                    // Call method restore
+                    restoreCompany(event.getCompanyId());
+                    log.info("Company {} restore user event", event.getCompanyId());
+                }
+                break;
+
             default:
                 log.debug("No action needed for user event: {}", event.getAction());
         }

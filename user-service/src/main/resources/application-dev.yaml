@@ -1,5 +1,5 @@
 server:
-  port: ${PORT:5000}
+  port: 5000
 
 spring:
   application:
@@ -21,20 +21,21 @@ spring:
 
   #database
   datasource:
-    url: jdbc:mysql://user-db:3306/user_service
+    #url: "jdbc:mysql://localhost:2001/user_service"     #using local
+    url: jdbc:mysql://user-db:3306/user_service     # using docker container
     driverClassName: "com.mysql.cj.jdbc.Driver"
-    username: ${USER_DB_USERNAME}
-    password: ${USER_DB_PASSWORD}
+    username: root
+    password: userservice
 
 #Eureka
 eureka:
   instance:
     prefer-ip-address: true   # Use IP address instead of hostname
     instance-id: ${spring.application.name}:${server.port}
-
   client:
     service-url:
-      defaultZone: http://eureka-server:8762/eureka/
+      #defaultZone: http://localhost:8762/eureka/   # register on Eureka
+      defaultZone: http://eureka-server:8762/eureka/ # using Docker
 
 
 

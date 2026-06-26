@@ -10,7 +10,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 
-public class CompanyEvent extends BaseEvent {
+public class CompanyEvent extends BaseEvent
+{
     public static final String TOPIC = "company-events";
 
     private Long companyId;

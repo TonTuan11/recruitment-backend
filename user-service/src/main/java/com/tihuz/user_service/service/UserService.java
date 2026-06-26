@@ -1,8 +1,10 @@
 package com.tihuz.user_service.service;
 
+import com.tihuz.common.event.CompanyEvent;
 import com.tihuz.common.event.UserEvent;
 import com.tihuz.common.exception.AppException;
 import com.tihuz.common.exception.ErrorCode;
+import com.tihuz.user_service.Enum.RoleType;
 import com.tihuz.user_service.dto.request.UserUpdateRequest;
 import com.tihuz.user_service.dto.response.UserResponse;
 import com.tihuz.user_service.entity.User;
@@ -14,6 +16,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -72,28 +75,38 @@ public class UserService
     {
         Page<User> page;
         if (keyword != null && !keyword.isEmpty()) {
-            page = userRepository.findByIsDeletedFalseAndUsernameContainingIgnoreCaseOrEmailContainingIgnoreCase(keyword, keyword, pageable);
+            page = userRepository.findByIsDeletedFalseAndUsernameContainingIgnoreCaseOrIsDeletedFalseAndEmailContainingIgnoreCase(keyword, keyword, pageable);
         } else {
             page = userRepository.findByIsDeletedFalse(pageable);
         }
         return page.map(userMapper::toUserResponse);
     }
 
-    public Page<UserResponse> getDeletedUsers(Pageable pageable, String keyword) {
+    public Page<UserResponse> getDeletedUsers(Pageable pageable, String keyword)
+    {
         Page<User> page;
-        if (keyword != null && !keyword.isEmpty()) {
-            page = userRepository.findByIsDeletedTrueAndUsernameContainingIgnoreCaseOrEmailContainingIgnoreCase(keyword, keyword, pageable);
+        if (keyword != null && !keyword.isEmpty())
+        {
+            page = userRepository.findByIsDeletedTrueAndUsernameContainingIgnoreCaseOrIsDeletedTrueAndEmailContainingIgnoreCase(keyword, keyword, pageable);
         } else {
             page = userRepository.findByIsDeletedTrue(pageable);
         }
         return page.map(userMapper::toUserResponse);
     }
 
-    public void restoreUser(Long userId) {
+    public void restoreUser(Long userId)
+    {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXITS));
         user.setIsDeleted(false);
         userRepository.save(user);
+
+        // Send event user restore
+        UserEvent event = new UserEvent();
+        event.setUserId(user.getId());
+        event.setCompanyId(user.getCompanyId());
+        event.setAction("RESTORE");
+        kafkaTemplate.send(UserEvent.TOPIC, event);
     }
 
 
@@ -147,7 +160,7 @@ public class UserService
 
     public String hardDeleteUserId(Long userId)
     {
-        User user = userRepository.findByIdAndIsDeletedFalse(userId)
+        User user = userRepository.findByIdAndIsDeletedTrue(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXITS));
 
         userRepository.deleteById(user.getId());
@@ -160,6 +173,78 @@ public class UserService
         kafkaTemplate.send(UserEvent.TOPIC, event);
 
         return "User hard deleted";
+    }
+
+
+
+
+    @KafkaListener(topics = CompanyEvent.TOPIC, groupId = "user-service-group")
+    public void handleCompanyEvent(CompanyEvent event)
+    {
+        log.info("User Service received CompanyEvent: Action={}, CompanyId={}",
+                event.getAction(), event.getCompanyId());
+
+        if (event.getCompanyId() == null)
+        {
+            log.warn("CompanyEvent missing companyId, skipping");
+            return;
+        }
+
+        switch (event.getAction())
+        {
+            case "SOFT_DELETED":
+                softDeleteUserByCompanyId(event.getCompanyId());
+                break;
+
+            case "HARD_DELETED":
+                hardDeleteUserByCompanyId(event.getCompanyId());
+                break;
+
+            case "RESTORE":
+                restoreUserByCompanyId(event.getCompanyId());
+                break;
+
+            default:
+                log.debug("No action needed for company event: {}", event.getAction());
+        }
+    }
+
+    private void softDeleteUserByCompanyId(Long companyId)
+    {
+        User user = userRepository.findByCompanyIdAndRoleAndIsDeletedFalse(companyId, RoleType.COMPANY)
+                .orElse(null);
+        if (user == null)
+        {
+            log.warn("No active COMPANY user found for companyId: {}", companyId);
+            return;
+        }
+        user.setIsDeleted(true);
+        userRepository.save(user);
+        log.info("Soft deleted user {} for company {}", user.getId(), companyId);
+    }
+
+    private void hardDeleteUserByCompanyId(Long companyId)
+    {
+        User user = userRepository.findByCompanyIdAndRole(companyId, RoleType.COMPANY)
+                .orElse(null);
+        if (user == null)
+        {
+            log.warn("No COMPANY user found for companyId: {}", companyId);
+            return;
+        }
+        userRepository.delete(user);
+        log.info("Hard deleted user {} for company {}", user.getId(), companyId);
+    }
+
+    private void restoreUserByCompanyId(Long companyId)
+    {
+        List<User> users = userRepository.findAllByCompanyId(companyId);
+
+        if (users.isEmpty()) return;
+
+        users.forEach(u -> u.setIsDeleted(false));
+
+        userRepository.saveAll(users);
     }
 
 

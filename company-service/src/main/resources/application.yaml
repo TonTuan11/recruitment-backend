@@ -1,5 +1,5 @@
 server:
-  port: 5003
+  port: ${SERVER_PORT:5003}
 
 spring:
   application:
@@ -23,10 +23,10 @@ spring:
 
 #databae
   datasource:
-    url: "jdbc:mysql://company-db:3306/company_service"
+    url: jdbc:mysql://company-db:3306/company_service
     driverClassName: "com.mysql.cj.jdbc.Driver"
-    username: root
-    password: companyservice
+    username: ${COMPANY_DB_USERNAME}
+    password: ${COMPANY_DB_PASSWORD}
 
 
 
@@ -38,6 +38,4 @@ eureka:
     instance-id: ${spring.application.name}:${server.port}
   client:
     service-url:
-      #defaultZone: http://localhost:8762/eureka/   # register on Eureka
-      defaultZone: http://eureka-server:8762/eureka/   # using docker
-
+      defaultZone: http://eureka-server:8762/eureka/

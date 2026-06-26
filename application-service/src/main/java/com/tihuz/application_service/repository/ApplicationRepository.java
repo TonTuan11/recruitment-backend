@@ -6,11 +6,12 @@ import com.tihuz.application_service.entity.Application;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 import java.util.List;
 import java.util.Optional;
 
-public interface ApplicationRepository extends JpaRepository<Application, Long> {
+public interface ApplicationRepository extends JpaRepository<Application, Long>, JpaSpecificationExecutor<Application> {
 
     Page<Application> findByUserId(Long userId, Pageable pageable);
 
@@ -19,6 +20,8 @@ public interface ApplicationRepository extends JpaRepository<Application, Long> 
     Page<Application> findByJobId(Long jobId, Pageable pageable);
 
     boolean existsByUserIdAndJobId(Long userId, Long Id);
+
+    boolean existsByUserIdAndJobIdAndIsDeletedFalse(Long userId, Long jobId);
 
     //SELECT * FROM application WHERE job_id IN (?, ?, ?)
     Page<Application> findByJobIdIn(List<Long> jobIds, Pageable pageable);

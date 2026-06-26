@@ -1,5 +1,5 @@
 server:
-  port: 5004
+  port: ${SERVER_PORT:5004}
 
 spring:
   application:
@@ -22,10 +22,10 @@ spring:
       max-request-size: 5MB
 
 minio:
-  endpoint: http://minio:9000
-  access-key: minioadmin
-  secret-key: minioadmin
-  bucket: avatars
+  endpoint: ${MINIO_ENDPOINT:http://minio:9000}
+  access-key: ${MINIO_ACCESS_KEY}
+  secret-key: ${MINIO_SECRET_KEY}
+  bucket: ${MINIO_BUCKET}
 
 # Eureka
 eureka:

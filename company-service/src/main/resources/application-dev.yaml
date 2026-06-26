@@ -1,12 +1,12 @@
 server:
-  port: ${PORT:5001}
+  port: 5003
 
 spring:
   application:
-    name: job-service
+    name: company-service
 
   config:
-    import: "optional:configserver:"     # use service id
+    import: "optional:configserver:"       # use service id
     #import: "optional:configserver:http://localhost:8888"   #  use localhost
 
 
@@ -20,13 +20,15 @@ spring:
 
 
 
-  #database
+
+  #databae
   datasource:
-    #url: "jdbc:mysql://localhost:2002/job_service"
-    url: "jdbc:mysql://job-db:3306/job_service"   #using docker container
+    url: "jdbc:mysql://company-db:3306/company_service"
     driverClassName: "com.mysql.cj.jdbc.Driver"
-    username: ${JOB_DB_USERNAME}
-    password: ${JOB_DB_PASSWORD}
+    username: root
+    password: companyservice
+
+
 
 
 #Eureka
@@ -36,6 +38,6 @@ eureka:
     instance-id: ${spring.application.name}:${server.port}
   client:
     service-url:
-     #defaultZone: http://localhost:8762/eureka/   # register on Eureka
+      #defaultZone: http://localhost:8762/eureka/   # register on Eureka
       defaultZone: http://eureka-server:8762/eureka/   # using docker
 

@@ -42,6 +42,18 @@ public class ApplicationController {
                 .build();
     }
 
+
+
+    @GetMapping("/{id}")
+    @PreAuthorize("isAuthenticated()")
+    public ApiResponse<ApplicationResponse> getApplicationById(
+            @PathVariable Long id)
+    {
+        return ApiResponse.<ApplicationResponse>builder()
+                .result(applicationService.getApplicationById(id))
+                .build();
+    }
+
 //    @GetMapping("/job/{jobId}")
 //    public ApiResponse<List<ApplicationResponse>> getByJob(
 //            @PathVariable Long jobId
@@ -53,6 +65,7 @@ public class ApplicationController {
 //    }
 
     @GetMapping("/company")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('COMPANY')")
     public ApiResponse<Page<ApplicationResponse>> getApplicationCompany( @RequestParam(defaultValue = "0") int page,
                                                                          @RequestParam(defaultValue = "10") int size)
     {
@@ -100,13 +113,13 @@ public class ApplicationController {
     }
 
 
-    @PreAuthorize("hasRole('ADMIN') or #userId.toString() == authentication.name")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('COMPANY')")
     @GetMapping("/job/{jobId}")
     public ApiResponse<Page<ApplicationResponse>> getApplicationsByJob(
             @PathVariable Long jobId,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam Long userId)
+            @RequestParam(defaultValue = "10") int size)
+
     {
         return ApiResponse.<Page<ApplicationResponse>>builder()
                 .result(applicationService.getApplicationsByJob(jobId, page, size))
@@ -118,13 +131,13 @@ public class ApplicationController {
     public ApiResponse<Page<ApplicationResponse>> getActiveApplications(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam(required = false) Long jobId,
-            @RequestParam(required = false) Long userId)
+            @RequestParam(required = false)  String userName,
+            @RequestParam(required = false) String jobTitle)
     {
         Pageable pageable = PageRequest.of(page, size);
 
         return ApiResponse.<Page<ApplicationResponse>>builder()
-                .result(applicationService.getActiveApplications(pageable, jobId, userId))
+                .result(applicationService.getActiveApplications(pageable,  userName,jobTitle))
                 .build();
     }
 
@@ -133,13 +146,14 @@ public class ApplicationController {
     public ApiResponse<Page<ApplicationResponse>> getDeletedApplications(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam(required = false) Long jobId,
-            @RequestParam(required = false) Long userId)
+
+            @RequestParam(required = false)  String userName,
+            @RequestParam(required = false) String jobTitle)
     {
         Pageable pageable = PageRequest.of(page, size);
 
         return ApiResponse.<Page<ApplicationResponse>>builder()
-                .result(applicationService.getDeleteApplications(pageable, jobId, userId))
+                .result(applicationService.getDeleteApplications(pageable, userName,jobTitle))
                 .build();
     }
 
@@ -164,6 +178,37 @@ public class ApplicationController {
                 .build();
     }
 
+
+    @PostMapping("/{id}/reapply")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
+    public ApiResponse<ApplicationResponse> reapply(
+            @PathVariable Long id,
+            @RequestBody(required = false) ApplyJobRequest request)
+    {
+        return ApiResponse.<ApplicationResponse>builder()
+                .result(applicationService.reapply(id, request))
+                .build();
+    }
+
+
+
+    @DeleteMapping("/soft/{id}")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
+    public ApiResponse<Void> softDeleteApplication(@PathVariable Long id) {
+        applicationService.softDeleteApplication(id);
+        return ApiResponse.<Void>builder().message("Đã rút đơn ứng tuyển").build();
+    }
+
+
+    @DeleteMapping("/hard/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ApiResponse<Void> hardDeleteApplication(@PathVariable Long id)
+    {
+        applicationService.hardDeleteApplication(id);
+        return ApiResponse.<Void>builder()
+                .message("Đã xóa cứng đơn ứng tuyển")
+                .build();
+    }
 
     @DeleteMapping("/by-job/{jobId}")
     @PreAuthorize("hasRole('ADMIN')")

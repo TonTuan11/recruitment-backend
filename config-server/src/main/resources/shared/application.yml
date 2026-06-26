@@ -1,8 +1,8 @@
 # JWT
 jwt:
-  signerKey: "77D09NocEMSCaWDllpOWfkkG46xpcOccxGt0eHn90MJ1AT7lZ7u+qwFaOjaAUips"
-  valid-duration: 3600
-  refreshable-duration: 86400
+  signerKey: ${JWT_SIGNER_KEY}
+  valid-duration: ${JWT_VALID_DURATION:3600}
+  refreshable-duration: ${JWT_REFRESH_DURATION:86400}
 
 #Eureka
 #eureka:
@@ -27,6 +27,7 @@ jwt:
 #      application: ${spring.application.name}
 
 
+# Zipkin Tracing
 management:
   tracing:
     sampling:
@@ -37,7 +38,7 @@ management:
   zipkin:
     tracing:
       #endpoint: "http://localhost:9411/api/v2/spans"   #using local
-      endpoint: "http://zipkin:9411/api/v2/spans"    #using docker container
+      endpoint: ${ZIPKIN_ENDPOINT:http://zipkin:9411/api/v2/spans}    #using docker container
 
   observations:
     key-values:

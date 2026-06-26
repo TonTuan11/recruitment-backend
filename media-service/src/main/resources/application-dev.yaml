@@ -1,9 +1,9 @@
 server:
-  port: ${PORT:5000}
+  port: 5004
 
 spring:
   application:
-    name: user-service
+    name: media-service
 
   config:
     import: "optional:configserver:"   # call config server
@@ -15,26 +15,23 @@ spring:
       discovery:
         enabled: true   #Enable discovery to find Config Server in Eureka.
         service-id: config-server
-      name: datasource-db,spring-mvc,kafka,timezone    # Import required config file
 
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 5MB
 
+minio:
+  endpoint: http://minio:9000
+  access-key: minioadmin
+  secret-key: minioadmin
+  bucket: avatars
 
-  #database
-  datasource:
-    url: jdbc:mysql://user-db:3306/user_service
-    driverClassName: "com.mysql.cj.jdbc.Driver"
-    username: ${USER_DB_USERNAME}
-    password: ${USER_DB_PASSWORD}
-
-#Eureka
+# Eureka
 eureka:
   instance:
-    prefer-ip-address: true   # Use IP address instead of hostname
+    prefer-ip-address: true
     instance-id: ${spring.application.name}:${server.port}
-
   client:
     service-url:
       defaultZone: http://eureka-server:8762/eureka/
-
-
-

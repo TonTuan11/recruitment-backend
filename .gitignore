@@ -69,9 +69,9 @@ docker-compose.override.yml
 *.pid.lock
 
 # Spring Boot configuration overrides (local)
-application-local.properties
-application-dev.properties
-application-prod.properties
+application-local.yaml
+application-dev.yaml
+application-prod.yaml
 bootstrap-local.yml
 bootstrap-dev.yml
 

@@ -1,5 +1,5 @@
 server:
-  port: ${SERVER_PORT:1111}
+  port: 1111
 
 spring:
   application:
@@ -74,7 +74,7 @@ spring:
     config:
       discovery:
         enabled: true   #Enable discovery to find Config Server in Eureka.
-        service-id: ${CONFIG_SERVER_SERVICE_ID:config-server}
+        service-id: config-server
 
 
 
@@ -135,7 +135,8 @@ eureka:
     instance-id: ${spring.application.name}:${server.port}
   client:
     service-url:
-      defaultZone: ${EUREKA_SERVER_URL:http://eureka-server:8762/eureka/}
+      #defaultZone: http://localhost:8762/eureka/   # register on Eureka
+      defaultZone: http://eureka-server:8762/eureka/  # using Docker containers
 
 
 

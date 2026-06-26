@@ -1,5 +1,5 @@
 server:
-  port: ${PORT:5002}
+  port: 5002
 
 spring:
   application:
@@ -7,7 +7,7 @@ spring:
 
   config:
     import: "optional:configserver:"  # use service id
-   #import: "optional:configserver:http://localhost:8888"   #   use localhost
+    #import: "optional:configserver:http://localhost:8888"   #   use localhost
 
 
   #config-server
@@ -27,8 +27,8 @@ spring:
     #url: "jdbc:mysql://localhost:2003/application_service"
     url: "jdbc:mysql://application-db:3306/application_service"     #using docker container
     driverClassName: "com.mysql.cj.jdbc.Driver"
-    username: ${APPLICATION_DB_USERNAME}
-    password: ${APPLICATION_DB_PASSWORD}
+    username: root
+    password: applicationservice
 
 
 #Eureka

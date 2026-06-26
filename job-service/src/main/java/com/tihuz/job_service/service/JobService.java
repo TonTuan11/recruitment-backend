@@ -440,7 +440,7 @@ public class JobService {
     {
         Page<Job> page;
         if (keyword != null && !keyword.isEmpty()) {
-            page = jobRepository.findByIsDeletedFalseAndTitleContainingIgnoreCase(keyword, pageable);
+            page = jobRepository.findByIsDeletedTrueAndTitleContainingIgnoreCase(keyword, pageable);
         } else {
             page = jobRepository.findByIsDeletedTrue(pageable);
         }

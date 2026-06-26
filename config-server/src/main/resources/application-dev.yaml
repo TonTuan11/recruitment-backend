@@ -1,13 +1,13 @@
 server:
-  port: ${SERVER_PORT:8888}
+  port: 8888
 
 spring:
   application:
     name: config-server
 
   profiles:   #It defines how the Config Server loads configuration.
-    active: ${CONFIG_PROFILE:native} #native (local: File in the project or on the local disk. )
-                  #git (Git repository: GitHub, GitLab...)
+    active: native #native (local: File in the project or on the local disk. )
+    #git (Git repository: GitHub, GitLab...)
 
   #config server - native
   cloud:
@@ -26,4 +26,4 @@ eureka:
   client:
     service-url:
       #defaultZone: http://localhost:8762/eureka/   # register on Eureka
-      defaultZone: ${EUREKA_SERVER_URL:http://eureka-server:8762/eureka/}  # using Docker containers
+      defaultZone: http://eureka-server:8762/eureka/  # using Docker containers

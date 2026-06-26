@@ -29,9 +29,16 @@ public class Application {
 
     @Column(nullable = false)
     Long userId;
+    String userName;
 
     @Column(nullable = false)
     Long jobId;
+    String jobTitle;
+
+
+    //+ Snapshot by Json
+    @Column(columnDefinition = "TEXT")
+    String jobSnapshotJson;
 
     String cvUrl;
 

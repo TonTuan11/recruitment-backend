@@ -17,8 +17,13 @@ public class ApplicationResponse {
     Long id;
 
     Long userId;
+    String userName;
+    String email;
+    String avatarUrl;
 
     Long jobId;
+    String jobTitle;
+
 
     String cvUrl;
 
@@ -37,6 +42,9 @@ public class ApplicationResponse {
 
     // enrich by job-service
     JobResponse job;
+
+    // +: snapshot đầy đủ (JobResponse)
+    JobResponse jobSnapshot;
 
 
 }

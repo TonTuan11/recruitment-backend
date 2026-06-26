@@ -23,6 +23,15 @@
     ports:
       - "8888:8888"
 
+    environment:
+      SERVER_PORT: 8888
+      CONFIG_PROFILE: native
+      EUREKA_SERVER_URL: http://eureka-server:8762/eureka/
+      JWT_SIGNER_KEY: ${JWT_SIGNER_KEY}
+      JWT_VALID_DURATION: ${JWT_VALID_DURATION}
+      JWT_REFRESH_DURATION: ${JWT_REFRESH_DURATION}
+    
+
     depends_on:
       eureka-server:
         condition: service_started
@@ -116,7 +125,7 @@
     container_name: user-db
     image: mysql:8
     environment:
-      MYSQL_ROOT_PASSWORD: userservice
+      MYSQL_ROOT_PASSWORD: ${MYSQL_USER_ROOT_PASSWORD}
       MYSQL_DATABASE: user_service
     ports:
       - "2001:3306"
@@ -132,7 +141,7 @@
     container_name: job-db
     image: mysql:8
     environment:
-      MYSQL_ROOT_PASSWORD: jobservice
+      MYSQL_ROOT_PASSWORD: ${MYSQL_JOB_ROOT_PASSWORD}
       MYSQL_DATABASE: job_service
     ports:
       - "2002:3306"
@@ -148,7 +157,7 @@
     container_name: application-db
     image: mysql:8
     environment:
-      MYSQL_ROOT_PASSWORD: applicationservice
+      MYSQL_ROOT_PASSWORD: ${MYSQL_APPLICATION_ROOT_PASSWORD}
       MYSQL_DATABASE: application_service
     ports:
       - "2003:3306"
@@ -165,7 +174,7 @@
     container_name: company-db
     image: mysql:8
     environment:
-      MYSQL_ROOT_PASSWORD: companyservice
+      MYSQL_ROOT_PASSWORD: ${MYSQL_COMPANY_ROOT_PASSWORD}
       MYSQL_DATABASE: company_service
     ports:
       - "2004:3306"
@@ -186,8 +195,9 @@
       - "9000:9000"
       - "9001:9001"
     environment:
-      MINIO_ROOT_USER: minioadmin
-      MINIO_ROOT_PASSWORD: minioadmin
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
+      MINIO_BUCKET: ${MINIO_BUCKET}
     volumes:
       - minio_data:/data
     networks:
@@ -207,6 +217,10 @@
     ports:
       - "5000:5000"
 
+    environment:
+      USER_DB_USERNAME: ${USER_DB_USERNAME}
+      USER_DB_PASSWORD: ${USER_DB_PASSWORD}
+
     depends_on:
       user-db:
         condition: service_started
@@ -222,7 +236,7 @@
     - ./logs:/app/logs
 
   # =========================
-  # JOB SERVICE
+  # JOB SERVICE 
   # =========================
   job-service:
     restart: always
@@ -230,6 +244,10 @@
     build: ./job-service
     ports:
       - "5001:5001"
+
+    environment:
+      JOB_DB_USERNAME: ${JOB_DB_USERNAME}
+      JOB_DB_PASSWORD: ${JOB_DB_PASSWORD}
 
     depends_on:
       job-db:
@@ -255,6 +273,10 @@
     ports:
       - "5002:5002"
 
+    environment:
+      APPLICATION_DB_USERNAME: ${APPLICATION_DB_USERNAME}
+      APPLICATION_DB_PASSWORD: ${APPLICATION_DB_PASSWORD}
+    
     depends_on:
       application-db:
         condition: service_started
@@ -280,6 +302,10 @@
     ports:
       - "5003:5003"
 
+    environment:
+      COMPANY_DB_USERNAME: ${COMPANY_DB_USERNAME}
+      COMPANY_DB_PASSWORD: ${COMPANY_DB_PASSWORD}
+
     depends_on:
       company-db:
         condition: service_started
@@ -304,6 +330,11 @@
     build: ./media-service
     ports:
       - "5004:5004"
+
+    environment:
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
+      MINIO_BUCKET: ${MINIO_BUCKET}
 
     depends_on:
       eureka-server:

@@ -4,7 +4,8 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 @Data
-public abstract class BaseEvent {
+public abstract class BaseEvent
+{
     private String eventId;
     private String eventType;
     private LocalDateTime timestamp;
