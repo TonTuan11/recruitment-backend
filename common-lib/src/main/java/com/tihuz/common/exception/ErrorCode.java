@@ -2,12 +2,11 @@ package com.tihuz.common.exception;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import org.springframework.http.HttpStatus;
 
 @Getter
 @AllArgsConstructor
-@NoArgsConstructor
+
 public enum ErrorCode {
 
 
@@ -18,6 +17,8 @@ public enum ErrorCode {
     PASSWORD_INVALID(4002, "Password Invalid.", HttpStatus.BAD_REQUEST),
     COMPANY_NAME_REQUIRED(400, "Company name is required for company registration", HttpStatus.BAD_REQUEST),
     EMAIL_ALREADY_EXISTS(400, "Email already exists.", HttpStatus.BAD_REQUEST),
+    INVALID_OTP(4004, "Invalid or expired OTP.", HttpStatus.BAD_REQUEST),
+    OTP_NULL(4004, "OTP Null", HttpStatus.BAD_REQUEST),
 
     // APPLICATION-SERVICE
     APPLICATION_ALREADY_EXISTS(1008, "Application already exists", HttpStatus.BAD_REQUEST),

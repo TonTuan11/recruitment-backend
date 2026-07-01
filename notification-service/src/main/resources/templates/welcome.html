@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Chào mừng đến với TizJob</title>
+</head>
+
+<body style="margin:0;padding:30px;background:#f4f6f9;font-family:Arial,Helvetica,sans-serif;">
+
+<div style="max-width:600px;margin:auto;background:#ffffff;border-radius:10px;overflow:hidden;border:1px solid #e8e8e8;">
+
+    <!-- Header -->
+    <div style="background:#0b63e5;padding:24px 30px;">
+        <h2 style="margin:0;color:#ffffff;font-weight:600;">
+            TizJob
+        </h2>
+        <p style="margin:8px 0 0;color:#dceaff;font-size:14px;">
+            Kết nối cơ hội nghề nghiệp dành cho bạn
+        </p>
+    </div>
+
+    <!-- Body -->
+    <div style="padding:35px 30px;color:#333;font-size:15px;line-height:1.8;">
+
+        <h3 style="margin-top:0;color:#222;">
+            Xin chào <span style="color:#0b63e5;" th:text="${username}">bạn</span>,
+        </h3>
+
+        <p>
+            Cảm ơn bạn đã đăng ký tài khoản tại <strong>TizJob</strong>.
+            Tài khoản của bạn đã được tạo thành công.
+        </p>
+
+        <p>
+            Từ bây giờ, bạn có thể tìm kiếm việc làm, khám phá các doanh nghiệp
+            phù hợp và ứng tuyển vào những vị trí mình quan tâm.
+        </p>
+
+        <div style="text-align:center;margin:35px 0;">
+            <a href="http://localhost:5173"
+               style="display:inline-block;
+                      background:#0b63e5;
+                      color:#ffffff;
+                      text-decoration:none;
+                      padding:12px 26px;
+                      border-radius:6px;
+                      font-weight:bold;">
+                Truy cập TizJob
+            </a>
+        </div>
+
+
+        <p style="margin-top:30px;">
+            Chúc bạn sớm tìm được công việc phù hợp!
+        </p>
+
+        <p style="margin-bottom:0;">
+            Trân trọng,<br>
+            <strong>Đội ngũ TizJob</strong>
+        </p>
+
+    </div>
+
+    <!-- Footer -->
+    <div style="padding:18px 30px;background:#fafafa;border-top:1px solid #ececec;text-align:center;font-size:13px;color:#777;">
+        © 2026 TizJob. All rights reserved.
+    </div>
+
+</div>
+
+</body>
+</html>

@@ -4,10 +4,13 @@ package com.tihuz.user_service.controller;
 import com.nimbusds.jose.JOSEException;
 import com.tihuz.common.dto.ApiResponse;
 import com.tihuz.user_service.dto.request.AuthenticationRequest;
+import com.tihuz.user_service.dto.request.ForgetPasswordRequest;
+import com.tihuz.user_service.dto.request.ResetPasswordRequest;
 import com.tihuz.user_service.dto.request.UserCreatedRequest;
 import com.tihuz.user_service.dto.response.AuthenticationResponse;
 import com.tihuz.user_service.dto.response.UserResponse;
 import com.tihuz.user_service.service.AuthenticationService;
+import com.tihuz.user_service.service.UserService;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +28,7 @@ public class AuthenticationController
 {
 
     AuthenticationService authenticationService;
+    UserService userService;
 
     @PostMapping("/login")
     public ApiResponse<AuthenticationResponse> login(@RequestBody @Valid AuthenticationRequest request) throws JOSEException
@@ -42,5 +46,22 @@ public class AuthenticationController
                 .build();
     }
 
+    @PostMapping("/forgot-password")
+    public ApiResponse<String> forgotPassword(@RequestBody @Valid ForgetPasswordRequest request)
+    {
+        userService.requestPasswordReset(request.getEmail());
+        return ApiResponse.<String>builder()
+                .message("OTP has been sent to your email")
+                .build();
+    }
+
+    @PostMapping("/reset-password")
+    public ApiResponse<String> resetPassword(@RequestBody @Valid ResetPasswordRequest request)
+    {
+        userService.resetPassword(request.getEmail(), request.getOtp(), request.getNewPassword());
+        return ApiResponse.<String>builder()
+                .message("Password reset successfully")
+                .build();
+    }
 
 }

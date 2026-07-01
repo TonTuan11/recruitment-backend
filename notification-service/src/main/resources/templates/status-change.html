@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Thông báo trạng thái</title>
+</head>
+<body style="font-family: Arial, sans-serif; background-color: #f4f7fc; padding: 20px;">
+<div style="max-width: 600px; margin: 0 auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+    <h2 style="color: #0b63e5;">Xin chào <span th:text="${username}"></span>,</h2>
+    <p>Đơn ứng tuyển của bạn cho vị trí <strong th:text="${jobTitle}"></strong> đã được <strong th:text="${status}"></strong>.</p>
+    <p>Vui lòng đăng nhập để xem chi tiết: <a href="http://localhost:5173/applications" style="color: #0b63e5;">Xem đơn của tôi</a></p>
+    <hr style="border: none; border-top: 1px solid #eaeaea; margin: 20px 0;">
+    <p style="color: #666; font-size: 13px;">© 2026 TizJob. All rights reserved.</p>
+</div>
+</body>
+</html>

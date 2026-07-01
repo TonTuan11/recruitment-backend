@@ -14,9 +14,14 @@ spring:
     config:
       server:
         native:
-          search-locations: classpath:/shared # Common configuration files directory (src/main/resources/shared)
+          #search-locations: classpath:/shared # Common configuration files directory (src/main/resources/shared)
+          search-locations: file:/app/config/shared
 
 
+        overrides:
+          jwt.signerKey: ${JWT_SIGNER_KEY}
+          jwt.valid-duration: ${JWT_VALID_DURATION}
+          jwt.refreshable-duration: ${JWT_REFRESH_DURATION}
 
 #Eureka
 eureka:

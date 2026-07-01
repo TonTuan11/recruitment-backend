@@ -1,15 +1,19 @@
 package com.tihuz.common.event;
 
+import lombok.AccessLevel;
 import lombok.Data;
+import lombok.experimental.FieldDefaults;
+
 import java.time.LocalDateTime;
 
 @Data
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public abstract class BaseEvent
 {
-    private String eventId;
-    private String eventType;
-    private LocalDateTime timestamp;
-    private String source;
+     String eventId;
+     String eventType;
+     LocalDateTime timestamp;
+     String source;
 
     public BaseEvent() {
         this.timestamp = LocalDateTime.now();

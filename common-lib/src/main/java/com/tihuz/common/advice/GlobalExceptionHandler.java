@@ -4,6 +4,7 @@ package com.tihuz.common.advice;
 import com.tihuz.common.dto.ApiResponse;
 import com.tihuz.common.exception.AppException;
 import com.tihuz.common.exception.ErrorCode;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -17,6 +18,7 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 
 @Slf4j
 @ControllerAdvice
+@Getter
 public class GlobalExceptionHandler {
 
     //500

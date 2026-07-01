@@ -128,7 +128,8 @@ public class AuthenticationService
 
 
     @Transactional
-    public UserResponse register(UserCreatedRequest request) {
+    public UserResponse register(UserCreatedRequest request)
+    {
         // Check username/email exist
         if (userRepository.existsByUsername(request.getUsername()))
         {
@@ -185,14 +186,16 @@ public class AuthenticationService
         User saved = userRepository.save(user);
 
         // Send event if registering as a company
-        if (request.isCompanyRegister())
-        {
+//        if (request.isCompanyRegister())
+//        {
             UserEvent event = new UserEvent();
             event.setUserId(saved.getId());
+            event.setEmail(saved.getEmail());
+            event.setUsername(saved.getUsername());
             event.setCompanyId(companyId);
             event.setAction("CREATED");
             kafkaTemplate.send(UserEvent.TOPIC, event);
-        }
+
 
         return userMapper.toUserResponse(saved);
     }

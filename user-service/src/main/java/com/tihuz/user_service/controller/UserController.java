@@ -3,6 +3,8 @@ package com.tihuz.user_service.controller;
 import com.tihuz.common.dto.ApiResponse;
 import com.tihuz.user_service.client.CompanyClient;
 import com.tihuz.user_service.dto.request.CompanyRequest;
+import com.tihuz.user_service.dto.request.ForgetPasswordRequest;
+import com.tihuz.user_service.dto.request.ResetPasswordRequest;
 import com.tihuz.user_service.dto.request.UserUpdateRequest;
 import com.tihuz.user_service.dto.response.CompanyResponse;
 import com.tihuz.user_service.dto.response.UserResponse;
@@ -157,4 +159,6 @@ public class UserController {
                 .message("Xóa user thành công")
                 .build();
     }
+
+
 }

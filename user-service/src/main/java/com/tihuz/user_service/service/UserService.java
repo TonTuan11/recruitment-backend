@@ -1,6 +1,7 @@
 package com.tihuz.user_service.service;
 
 import com.tihuz.common.event.CompanyEvent;
+import com.tihuz.common.event.PasswordResetEvent;
 import com.tihuz.common.event.UserEvent;
 import com.tihuz.common.exception.AppException;
 import com.tihuz.common.exception.ErrorCode;
@@ -21,9 +22,11 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -35,7 +38,8 @@ public class UserService
     UserRepository userRepository;
     PasswordEncoder passwordEncoder;
     UserMapper userMapper;
-    KafkaTemplate kafkaTemplate;
+    KafkaTemplate<String, Object> kafkaTemplate;
+    OtpService otpService;
 
     public UserResponse updateUser(Long UserId, UserUpdateRequest request)
     {
@@ -59,6 +63,52 @@ public class UserService
         return userMapper.toUserResponse(userRepository.save(user));
     }
 
+
+
+    // Request send OTP
+    @Transactional
+    public void requestPasswordReset(String email)
+    {
+        User user = userRepository.findByEmailAndIsDeletedFalse(email)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXITS));
+
+        //String otp = String.format("%06d", new Random().nextInt(999999));
+        String otp = String.valueOf(new Random().nextInt(900000)+100000);
+        log.info("Generated OTP = {}", otp);
+
+        // Save OTP to Redis instead of the local cache
+        otpService.saveOtp(email, otp);
+
+        // Publish event
+        PasswordResetEvent event = new PasswordResetEvent();
+        event.setUserId(user.getId());
+        event.setEmail(email);
+        event.setUsername(user.getUsername());
+        event.setOtp(otp);
+        log.info("OTP in event before Kafka = {}", event.getOtp());
+        kafkaTemplate.send(PasswordResetEvent.TOPIC, event);
+        log.info(" Published PasswordResetEvent for user: {}", email);
+    }
+
+    // Reset password with OTP
+    @Transactional
+    public void resetPassword(String email, String otp, String newPassword)
+    {
+        // check otp in Redis
+        if (!otpService.verifyOtp(email, otp))
+        {
+            throw new AppException(ErrorCode.INVALID_OTP);
+        }
+
+        // find user
+        User user = userRepository.findByEmailAndIsDeletedFalse(email)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXITS));
+
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+
+        log.info(" Password reset successfully for user: {}", email);
+    }
 
 
     public List<UserResponse> getAll()

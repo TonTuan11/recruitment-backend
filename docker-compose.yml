@@ -46,7 +46,8 @@
       - recruitment-network
     
     volumes:
-    - ./logs:/app/logs
+      - ./logs:/app/logs
+      - ./config-server/src/main/resources/shared:/app/config/shared
 
   # =========================
   # ZIPKIN
@@ -116,6 +117,26 @@
   #     KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
   #   networks:                  
   #     - recruitment-network
+
+
+
+
+  # =========================
+  # REDIS
+  # =========================
+  redis:
+    container_name: redis
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+      
+    environment:
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+
+    networks:
+      - recruitment-network
+
+
 
 
   # =========================
@@ -220,6 +241,8 @@
     environment:
       USER_DB_USERNAME: ${USER_DB_USERNAME}
       USER_DB_PASSWORD: ${USER_DB_PASSWORD}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
 
     depends_on:
       user-db:
@@ -342,6 +365,30 @@
 
     networks:
       - recruitment-network
+
+
+   #NOTIFICATION-SERVICE
+  notification-service:
+    restart: always
+    container_name: notification-service
+    build: ./notification-service
+    ports:
+      - "5005:5005"
+    environment:
+      MAIL_USERNAME: ${MAIL_USERNAME}
+      MAIL_PASSWORD: ${MAIL_PASSWORD}
+      EUREKA_SERVER_URL: http://eureka-server:8762/eureka/
+    depends_on:
+      eureka-server:
+        condition: service_started
+      config-server:
+        condition: service_healthy
+    networks:
+      - recruitment-network
+    volumes:
+      - ./logs:/app/logs
+
+
 
   # =========================
   # GATEWAY

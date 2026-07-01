@@ -14,7 +14,8 @@ import com.tihuz.application_service.mapper.ApplicationMapper;
 import com.tihuz.application_service.repository.ApplicationRepository;
 import com.tihuz.application_service.specification.ApplicationSpecification;
 import com.tihuz.common.dto.ApiResponse;
-import com.tihuz.common.event.JobEvent;
+import com.tihuz.common.event.ApplicationStatusEvent;
+
 import com.tihuz.common.exception.AppException;
 import com.tihuz.common.exception.ErrorCode;
 import lombok.AccessLevel;
@@ -27,6 +28,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.kafka.annotation.KafkaListener;
 
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -55,6 +57,7 @@ public class ApplicationService {
     //+
     ObjectMapper objectMapper;
 
+    KafkaTemplate<String, Object> kafkaTemplate;
 //    public ApplicationResponse apply(ApplyJobRequest request)
 //    {
 //        // Get current user ID
@@ -403,7 +406,8 @@ public class ApplicationService {
         ApiResponse<UserResponse> userResponse =
                 userClient.getUserById(app.getUserId());
 
-        if (userResponse != null && userResponse.getResult() != null) {
+        if (userResponse != null && userResponse.getResult() != null)
+        {
             response.setEmail(userResponse.getResult().getEmail());
             response.setAvatarUrl(userResponse.getResult().getAvatarUrl());
         }
@@ -519,14 +523,66 @@ public class ApplicationService {
         System.out.println("=== Jobs owned by user: " + jobIds);
         System.out.println("=== Is jobId " + application.getJobId() + " in list? " + jobIds.contains(application.getJobId()));
 
-        if (!jobIds.contains(application.getJobId())) {
+        if (!jobIds.contains(application.getJobId()))
+        {
             throw new AppException(ErrorCode.ACCESS_DENIED);
         }
 
+        // Lưu status mới
+        ApplicationsStatus oldStatus = application.getStatus();
         application.setStatus(request.getStatus());
         applicationRepository.save(application);
-        return applicationMapper.toApplicationResponse(application);
+
+
+//        applicationRepository.save(application);
+//        return applicationMapper.toApplicationResponse(application);
+
+        // Lấy thông tin user để gửi event
+        String userEmail = null;
+        String userUsername = null;
+
+        try
+        {
+            ApiResponse<UserResponse> userResp = userClient.getUserById(application.getUserId());
+
+            UserResponse user = userResp != null ? userResp.getResult() : null;
+
+            if (user != null)
+            {
+                userEmail = user.getEmail();
+                userUsername = user.getUsername();
+            }
+
+        }
+        catch (Exception e)
+        {
+            log.error("Failed to fetch user info for userId={}", application.getUserId(), e);
+        }
+
+
+        Application saved = applicationRepository.save(application);
+        // --- Publish event ---
+        try
+        {
+            ApplicationStatusEvent event = new ApplicationStatusEvent();
+            event.setApplicationId(saved.getId());
+            event.setUserId(saved.getUserId());
+            event.setUserEmail(userEmail);
+            event.setUserUsername(userUsername);
+            event.setJobTitle(saved.getJobTitle());
+            event.setOldStatus(saved.getStatus().name()); // hoặc lưu status cũ trước khi update
+            event.setNewStatus(request.getStatus().name());
+            kafkaTemplate.send(ApplicationStatusEvent.TOPIC, event);
+            log.info(" Published ApplicationStatusEvent: {}", event);
+        }
+        catch (Exception e)
+        {
+            log.error("Failed to publish ApplicationStatusEvent: {}", e.getMessage());
+        }
+
+        return applicationMapper.toApplicationResponse(saved);
     }
+
 
 //    private ApplicationResponse mapToResponse(Application application )
 //    {
