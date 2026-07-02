@@ -6,7 +6,7 @@ spring:
     name: user-service
 
   config:
-    import: "optional:configserver:"   # call config server
+    import: ${SPRING_CONFIG_IMPORT:optional:configserver:}   # call config server
     # optional: Do not crash the application immediately if the Config Server is unavailable.
     # configserver: Predefined prefix in Spring Boot.
 
@@ -48,7 +48,7 @@ eureka:
 
   client:
     service-url:
-      defaultZone: http://eureka-server:8762/eureka/
+      defaultZone: ${EUREKA_SERVER_URL:http://eureka-server:8762/eureka/}
 
 
 
