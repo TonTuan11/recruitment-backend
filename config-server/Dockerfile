@@ -4,7 +4,7 @@ WORKDIR /app
 
 COPY target/config-server-0.0.1-SNAPSHOT.jar app.jar
 
-#COPY src/main/resources/shared /app/config/shared
+COPY src/main/resources/shared /app/config/shared
 
 EXPOSE 8888
 

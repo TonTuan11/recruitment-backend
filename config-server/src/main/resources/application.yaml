@@ -6,7 +6,7 @@ spring:
     name: config-server
 
   profiles:   #It defines how the Config Server loads configuration.
-    active: ${CONFIG_PROFILE:native} #native (local: File in the project or on the local disk. )
+    active: ${CONFIG_PROFILE:native} #native (local: File in the project or on the local disk.)
                   #git (Git repository: GitHub, GitLab...)
 
   #config server - native
