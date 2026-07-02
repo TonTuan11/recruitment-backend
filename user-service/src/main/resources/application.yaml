@@ -21,7 +21,8 @@ spring:
 
   #database
   datasource:
-    url: jdbc:mysql://user-db:3306/user_service
+    url: jdbc:mysql://${USER_DB_HOST}:${USER_DB_PORT}/user_service
+    #url: jdbc:mysql://user-db:3306/user_service
     driverClassName: "com.mysql.cj.jdbc.Driver"
     username: ${USER_DB_USERNAME}
     password: ${USER_DB_PASSWORD}
