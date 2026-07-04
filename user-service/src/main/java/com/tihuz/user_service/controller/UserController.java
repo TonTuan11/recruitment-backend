@@ -109,7 +109,7 @@ public class UserController {
                 .build();
     }
 
-    @PreAuthorize("hasRole('ADMIN') or hasRole('COMPANY') or #userId.toString() == authentication.name")
+    //@PreAuthorize("hasRole('ADMIN') or hasRole('COMPANY') or #userId.toString() == authentication.name")
     @GetMapping("/{userId}")
     public ApiResponse<UserResponse> getUserId(@PathVariable Long userId)
     {

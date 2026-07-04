@@ -1,9 +1,9 @@
 spring:
   kafka:
-    bootstrap-servers: kafka:9092
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:kafka:9092}
 
     consumer:
-      bootstrap-servers: kafka:9092
+      bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:kafka:9092}
       group-id: ${spring.application.name}-group
       auto-offset-reset: earliest
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
@@ -18,8 +18,9 @@ spring:
           userEvent: com.tihuz.common.event.UserEvent
           applicationStatusEvent: com.tihuz.common.event.ApplicationStatusEvent
           passwordResetEvent: com.tihuz.common.event.PasswordResetEvent
+          newApplicationEvent: com.tihuz.common.event.NewApplicationEvent
 
     producer:
-      bootstrap-servers: kafka:9092
+      bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:kafka:9092}
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer

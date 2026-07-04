@@ -63,4 +63,14 @@ public class EmailService
         String body = templateService.renderResetPassword(username, otp);
         sendMail(to, "Đặt lại mật khẩu TizJob", body);
     }
+
+    @Async("emailExecutor")
+    public void sendNewApplicationEmail(String to, String companyUserName, String companyName,
+                                        String jobTitle, String applicantName,
+                                        String applicantEmail, String cvUrl, String coverLetter) {
+        String subject = "📩 Ứng viên mới ứng tuyển vào " + jobTitle;
+        String body = templateService.renderNewApplication(companyUserName, companyName, jobTitle,
+                applicantName, applicantEmail, cvUrl, coverLetter);
+        sendMail(to, subject, body);
+    }
 }

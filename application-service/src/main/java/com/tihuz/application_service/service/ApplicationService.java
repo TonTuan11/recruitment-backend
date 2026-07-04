@@ -2,11 +2,13 @@ package com.tihuz.application_service.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tihuz.application_service.Enum.ApplicationsStatus;
+import com.tihuz.application_service.client.CompanyClient;
 import com.tihuz.application_service.client.JobClient;
 import com.tihuz.application_service.client.UserClient;
 import com.tihuz.application_service.dto.request.ApplyJobRequest;
 import com.tihuz.application_service.dto.request.UpdateApplicationStatusRequest;
 import com.tihuz.application_service.dto.response.ApplicationResponse;
+import com.tihuz.application_service.dto.response.CompanyResponse;
 import com.tihuz.application_service.dto.response.JobResponse;
 import com.tihuz.application_service.dto.response.UserResponse;
 import com.tihuz.application_service.entity.Application;
@@ -16,6 +18,7 @@ import com.tihuz.application_service.specification.ApplicationSpecification;
 import com.tihuz.common.dto.ApiResponse;
 import com.tihuz.common.event.ApplicationStatusEvent;
 
+import com.tihuz.common.event.NewApplicationEvent;
 import com.tihuz.common.exception.AppException;
 import com.tihuz.common.exception.ErrorCode;
 import lombok.AccessLevel;
@@ -52,6 +55,8 @@ public class ApplicationService {
     JobClient jobClient;
 
     ApplicationMapper applicationMapper;
+
+    CompanyClient companyClient;
 
     UserClient userClient;
     //+
@@ -139,7 +144,48 @@ public class ApplicationService {
         application.setStatus(ApplicationsStatus.PENDING);
         application.setIsDeleted(false);
 
-        applicationRepository.save(application);
+        Application saved=applicationRepository.save(application);
+
+        String companyUserEmail = null;
+        String companyUserName = null;
+        try
+        {
+            Long jobOwnerId = jobResponse.getResult().getUserId();
+            ApiResponse<UserResponse> ownerResp = userClient.getUserById(jobOwnerId);
+            if (ownerResp != null && ownerResp.getResult() != null) {
+                UserResponse owner = ownerResp.getResult();
+                companyUserEmail = owner.getEmail();
+                companyUserName = owner.getUsername();
+            }
+        }
+        catch (Exception e)
+        {
+            log.error("Failed to fetch job owner info for userId={}", jobResponse.getResult().getUserId(), e);
+        }
+
+        // Publish event NewApplicationEvent
+        try {
+            NewApplicationEvent event = new NewApplicationEvent();
+            event.setApplicationId(saved.getId());
+            event.setJobId(saved.getJobId());
+            event.setJobTitle(saved.getJobTitle());
+            event.setCompanyId(jobResponse.getResult().getCompanyId());
+            event.setCompanyName(jobResponse.getResult().getCompanyName());
+            event.setCompanyEmail(companyUserEmail);
+            event.setCompanyUserName(companyUserName);
+            event.setUserId(saved.getUserId());
+            event.setApplicantName(userResponse.getResult().getUsername());
+            event.setApplicantEmail(userResponse.getResult().getEmail());
+            event.setCvUrl(saved.getCvUrl());
+            event.setCoverLetter(saved.getCoverLetter());
+            kafkaTemplate.send(NewApplicationEvent.TOPIC, event);
+            log.info("Published NewApplicationEvent for application {}", saved.getId());
+        }
+        catch (Exception e)
+        {
+            log.error("Failed to publish NewApplicationEvent", e);
+        }
+
         return applicationMapper.toApplicationResponse(application);
     }
 

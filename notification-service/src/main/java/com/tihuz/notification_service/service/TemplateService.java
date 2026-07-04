@@ -38,4 +38,18 @@ public class TemplateService
         context.setVariable("otp", otp);
         return templateEngine.process("reset-password", context);
     }
+
+    public String renderNewApplication(String companyUserName, String companyName,
+                                       String jobTitle, String applicantName,
+                                       String applicantEmail, String cvUrl, String coverLetter) {
+        Context context = new Context();
+        context.setVariable("companyUserName", companyUserName);
+        context.setVariable("companyName", companyName);
+        context.setVariable("jobTitle", jobTitle);
+        context.setVariable("applicantName", applicantName);
+        context.setVariable("applicantEmail", applicantEmail);
+        context.setVariable("cvUrl", cvUrl);
+        context.setVariable("coverLetter", coverLetter);
+        return templateEngine.process("new-application", context);
+    }
 }

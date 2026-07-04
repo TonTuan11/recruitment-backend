@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Ứng viên mới</title>
+</head>
+<body style="font-family: Arial, sans-serif; background-color: #f4f7fc; padding: 20px;">
+<div style="max-width: 600px; margin: 0 auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+    <h2 style="color: #0b63e5;">📩 Ứng viên mới</h2>
+    <p>Xin chào <strong th:text="${companyUserName}"></strong> (<span th:text="${companyName}"></span>),</p>
+    <p>Một ứng viên vừa ứng tuyển vào vị trí <strong th:text="${jobTitle}"></strong>.</p>
+
+    <div style="background: #f8fafc; padding: 15px; border-radius: 8px; margin: 15px 0;">
+        <p><strong>👤 Ứng viên:</strong> <span th:text="${applicantName}"></span></p>
+        <p><strong>📧 Email:</strong> <span th:text="${applicantEmail}"></span></p>
+        <p><strong>📄 CV:</strong> <a th:href="${cvUrl}" th:text="${cvUrl}" style="color: #0b63e5;"></a></p>
+        <div th:if="${coverLetter}">
+            <p><strong>📝 Thư giới thiệu:</strong></p>
+            <p style="white-space: pre-wrap;" th:text="${coverLetter}"></p>
+        </div>
+    </div>
+
+    <p>Vui lòng đăng nhập vào hệ thống để xem chi tiết và xử lý hồ sơ.</p>
+    <a href="http://localhost:5173/company/applications" style="display: inline-block; padding: 10px 20px; background: #0b63e5; color: white; text-decoration: none; border-radius: 8px;">Xem danh sách ứng viên</a>
+
+    <hr style="border: none; border-top: 1px solid #eaeaea; margin: 20px 0;">
+    <p style="color: #666; font-size: 13px;">© 2026 TizJob. All rights reserved.</p>
+</div>
+</body>
+</html>

@@ -1,0 +1,141 @@
+services:
+
+  # =========================
+  # USER SERVICE
+  # =========================
+  user-service:
+    ports: []
+    expose:
+      - "5000"
+
+  # =========================
+  # JOB SERVICE
+  # =========================
+  job-service:
+    ports: []
+    expose:
+      - "5001"
+
+  # =========================
+  # APPLICATION SERVICE
+  # =========================
+  application-service:
+    ports: []
+    expose:
+      - "5002"
+
+  # =========================
+  # COMPANY SERVICE
+  # =========================
+  company-service:
+    ports: []
+    expose:
+      - "5003"
+
+  # =========================
+  # MEDIA SERVICE
+  # =========================
+  media-service:
+    ports: []
+    expose:
+      - "5004"
+
+  # =========================
+  # NOTIFICATION SERVICE
+  # =========================
+  notification-service:
+    ports: []
+    expose:
+      - "5005"
+
+  # =========================
+  # API GATEWAY
+  # =========================
+  api-gateway:
+    ports: []
+    expose:
+      - "1111"
+
+  # =========================
+  # EUREKA
+  # =========================
+  eureka-server:
+    ports: []
+    expose:
+      - "8762"
+
+  # =========================
+  # CONFIG SERVER
+  # =========================
+  config-server:
+    ports: []
+    expose:
+      - "8888"
+
+  # =========================
+  # REDIS
+  # =========================
+  redis:
+    ports: []
+    expose:
+      - "6379"
+
+  # =========================
+  # KAFKA
+  # =========================
+  kafka:
+    ports: []
+    expose:
+      - "9092"
+
+  # =========================
+  # ZOOKEEPER
+  # =========================
+  zookeeper:
+    ports: []
+    expose:
+      - "2181"
+
+  # =========================
+  # MYSQL
+  # =========================
+  user-db:
+    ports: []
+
+  job-db:
+    ports: []
+
+  application-db:
+    ports: []
+
+  company-db:
+    ports: []
+
+  # =========================
+  # MINIO
+  # =========================
+  minio:
+    ports: []
+    expose:
+      - "9000"
+
+  # =========================
+  # ZIPKIN
+  # =========================
+  zipkin:
+    ports: []
+    expose:
+      - "9411"
+
+  # =========================
+  # NGINX
+  # =========================
+  nginx:
+    ports:
+      - "80:80"
+
+  # =========================
+  # CLOUDFLARED
+  # =========================
+  cloudflared:
+    restart: unless-stopped
