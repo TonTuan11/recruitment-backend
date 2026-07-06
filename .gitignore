@@ -64,6 +64,7 @@ dist/
 *.tsbuildinfo
 
 # Docker
+docker-compose.yml
 docker-compose.override.yml
 *.pid
 *.pid.lock
