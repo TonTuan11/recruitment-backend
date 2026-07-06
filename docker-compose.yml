@@ -10,6 +10,12 @@
     build: ./discovery-service
     ports:
       - "8762:8762"
+
+    environment:
+      JAVA_TOOL_OPTIONS: "-Xms128m -Xmx256m -XX:+UseG1GC -XX:+UseStringDeduplication"
+    
+    mem_limit: 256m
+    
     networks:
       - recruitment-network
 
@@ -30,6 +36,9 @@
       JWT_SIGNER_KEY: ${JWT_SIGNER_KEY}
       JWT_VALID_DURATION: ${JWT_VALID_DURATION}
       JWT_REFRESH_DURATION: ${JWT_REFRESH_DURATION}
+      JAVA_TOOL_OPTIONS: "-Xms128m -Xmx256m -XX:+UseG1GC -XX:+UseStringDeduplication"
+    
+    mem_limit: 256m
     
 
     depends_on:
@@ -55,6 +64,10 @@
   zipkin:
     container_name: zipkin
     image: openzipkin/zipkin
+
+    environment:
+      JAVA_OPTS: "-Xms64m -Xmx192m"
+
     ports:
       - "9411:9411"
     networks:
@@ -92,6 +105,7 @@
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181     #Địa chỉ kết nối đến Zookeeper, cho phép Kafka đăng ký và lấy thông tin về cluster.
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092    #Địa chỉ mà các client dùng để kết nối tới kafka. Sử dụng localhost nếu bạn chạy Kafka trên máy cục bộ, hoặc sử dụng địa chỉ IP hoặc hostname nếu bạn chạy Kafka trong môi trường mạng.
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_HEAP_OPTS: "-Xms128M -Xmx256M"
   
     ports:
       - "9092:9092"
@@ -145,6 +159,19 @@
   user-db:
     container_name: user-db
     image: mysql:8
+
+    command:
+      - --innodb-buffer-pool-size=128M
+      - --innodb-log-buffer-size=16M
+      - --max-connections=100
+      - --table-open-cache=128
+      - --table-definition-cache=128
+      - --performance-schema=OFF
+      - --tmp-table-size=16M
+      - --max-heap-table-size=16M
+      - --thread-cache-size=16
+
+
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_USER_ROOT_PASSWORD}
       MYSQL_DATABASE: user_service
@@ -161,6 +188,18 @@
   job-db:
     container_name: job-db
     image: mysql:8
+
+    command:
+      - --innodb-buffer-pool-size=128M
+      - --innodb-log-buffer-size=16M
+      - --max-connections=100
+      - --table-open-cache=128
+      - --table-definition-cache=128
+      - --performance-schema=OFF
+      - --tmp-table-size=16M
+      - --max-heap-table-size=16M
+      - --thread-cache-size=16
+
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_JOB_ROOT_PASSWORD}
       MYSQL_DATABASE: job_service
@@ -177,6 +216,18 @@
   application-db:
     container_name: application-db
     image: mysql:8
+
+    command:
+      - --innodb-buffer-pool-size=128M
+      - --innodb-log-buffer-size=16M
+      - --max-connections=100
+      - --table-open-cache=128
+      - --table-definition-cache=128
+      - --performance-schema=OFF
+      - --tmp-table-size=16M
+      - --max-heap-table-size=16M
+      - --thread-cache-size=16
+
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_APPLICATION_ROOT_PASSWORD}
       MYSQL_DATABASE: application_service
@@ -194,6 +245,18 @@
   company-db:
     container_name: company-db
     image: mysql:8
+
+    command:
+      - --innodb-buffer-pool-size=128M
+      - --innodb-log-buffer-size=16M
+      - --max-connections=100
+      - --table-open-cache=128
+      - --table-definition-cache=128
+      - --performance-schema=OFF
+      - --tmp-table-size=16M
+      - --max-heap-table-size=16M
+      - --thread-cache-size=16
+
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_COMPANY_ROOT_PASSWORD}
       MYSQL_DATABASE: company_service
@@ -245,6 +308,9 @@
       USER_DB_PASSWORD: ${USER_DB_PASSWORD}
       REDIS_HOST: redis
       REDIS_PORT: 6379
+      JAVA_TOOL_OPTIONS: "-Xms128m -Xmx256m -XX:+UseG1GC -XX:+UseStringDeduplication"
+    
+    mem_limit: 384m
 
     depends_on:
       user-db:
@@ -273,6 +339,9 @@
     environment:
       JOB_DB_USERNAME: ${JOB_DB_USERNAME}
       JOB_DB_PASSWORD: ${JOB_DB_PASSWORD}
+      JAVA_TOOL_OPTIONS: "-Xms128m -Xmx256m -XX:+UseG1GC -XX:+UseStringDeduplication"
+    
+    mem_limit: 384m
 
     depends_on:
       job-db:
@@ -301,6 +370,9 @@
     environment:
       APPLICATION_DB_USERNAME: ${APPLICATION_DB_USERNAME}
       APPLICATION_DB_PASSWORD: ${APPLICATION_DB_PASSWORD}
+      JAVA_TOOL_OPTIONS: "-Xms128m -Xmx256m -XX:+UseG1GC -XX:+UseStringDeduplication"
+    
+    mem_limit: 384m
     
     depends_on:
       application-db:
@@ -330,6 +402,9 @@
     environment:
       COMPANY_DB_USERNAME: ${COMPANY_DB_USERNAME}
       COMPANY_DB_PASSWORD: ${COMPANY_DB_PASSWORD}
+      JAVA_TOOL_OPTIONS: "-Xms128m -Xmx256m -XX:+UseG1GC -XX:+UseStringDeduplication"
+    
+    mem_limit: 384m
 
     depends_on:
       company-db:
@@ -360,6 +435,9 @@
       MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
       MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
       MINIO_BUCKET: ${MINIO_BUCKET}
+      JAVA_TOOL_OPTIONS: "-Xms128m -Xmx256m -XX:+UseG1GC -XX:+UseStringDeduplication"
+    
+    mem_limit: 384m
 
     depends_on:
       eureka-server:
@@ -380,6 +458,10 @@
       MAIL_USERNAME: ${MAIL_USERNAME}
       MAIL_PASSWORD: ${MAIL_PASSWORD}
       EUREKA_SERVER_URL: http://eureka-server:8762/eureka/
+      JAVA_TOOL_OPTIONS: "-Xms128m -Xmx256m -XX:+UseG1GC -XX:+UseStringDeduplication"
+    
+    mem_limit: 384m
+
     depends_on:
       eureka-server:
         condition: service_started
@@ -402,6 +484,11 @@
     ports:
       - "1111:1111"
 
+    environment:
+      JAVA_TOOL_OPTIONS: "-Xms128m -Xmx256m -XX:+UseG1GC -XX:+UseStringDeduplication"
+    
+    mem_limit: 256m
+
     depends_on:
       config-server:
         condition: service_healthy
@@ -414,6 +501,21 @@
     volumes:
     - ./logs:/app/logs
     
+
+
+  # =========================
+  # FRONTEND
+  # =========================
+  frontend:
+    container_name: frontend
+    build:
+      context: ../recruitment-frontend
+    restart: always
+    expose:
+      - "80"
+    networks:
+      - recruitment-network
+
 
 
   # =========================
@@ -431,6 +533,7 @@
       - ./nginx/conf.d:/etc/nginx/conf.d:ro
 
     depends_on:
+      - frontend
       - api-gateway
 
     restart: always
@@ -439,15 +542,27 @@
       - recruitment-network
 
 
+
+
+  # =========================
+  # CLOUDFLARED
+  # =========================
+
   cloudflared:
     image: cloudflare/cloudflared:latest
     container_name: cloudflared
     restart: unless-stopped
-    command: tunnel --no-autoupdate --url http://nginx:80
+
+    command: tunnel --no-autoupdate run
+
+    environment:
+      TUNNEL_TOKEN: ${TUNNEL_TOKEN}
+
     depends_on:
       - nginx
+
     networks:
-      - recruitment-network 
+      - recruitment-network
 
 
 

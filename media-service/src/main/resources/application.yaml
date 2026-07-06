@@ -27,6 +27,9 @@ minio:
   secret-key: ${MINIO_SECRET_KEY}
   bucket: ${MINIO_BUCKET}
 
+app:
+  media-url: ${MEDIA_PUBLIC_URL:https://tizjob.id.vn}
+
 # Eureka
 eureka:
   instance:

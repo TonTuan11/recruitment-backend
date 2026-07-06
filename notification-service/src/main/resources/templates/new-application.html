@@ -13,7 +13,21 @@
     <div style="background: #f8fafc; padding: 15px; border-radius: 8px; margin: 15px 0;">
         <p><strong>👤 Ứng viên:</strong> <span th:text="${applicantName}"></span></p>
         <p><strong>📧 Email:</strong> <span th:text="${applicantEmail}"></span></p>
-        <p><strong>📄 CV:</strong> <a th:href="${cvUrl}" th:text="${cvUrl}" style="color: #0b63e5;"></a></p>
+        <p><strong>📄 CV:</strong></p>
+
+        <a th:href="${cvUrl}"
+           target="_blank"
+           style="
+        display: inline-block;
+        padding: 10px 18px;
+        background-color: #0b63e5;
+        color: #ffffff;
+        text-decoration: none;
+        border-radius: 8px;
+        font-weight: bold;
+   ">
+            📄 Xem CV
+        </a>
         <div th:if="${coverLetter}">
             <p><strong>📝 Thư giới thiệu:</strong></p>
             <p style="white-space: pre-wrap;" th:text="${coverLetter}"></p>

@@ -22,6 +22,9 @@ public class MediaService {
     @Value("${minio.bucket}")
     private String bucketName;
 
+    @Value("${app.media-url}")
+    private String mediaUrl;
+
     // Upload ảnh (avatar, logo)
     public String uploadImage(MultipartFile file, String folder) {
         try {
@@ -108,7 +111,7 @@ public class MediaService {
             );
 
             // Trả về URL
-            String url = "http://localhost:9000/" + bucketName + "/" + fileName;
+            String url = mediaUrl +"/" + bucketName + "/" + fileName;
             log.info("File uploaded successfully: {}", url);
 
             return url;
