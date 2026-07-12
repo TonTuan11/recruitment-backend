@@ -6,17 +6,14 @@ spring:
     name: user-service
 
   config:
-    import: ${SPRING_CONFIG_IMPORT:optional:configserver:}   # call config server
+    #import: "optional:configserver"   # call config server in eruka
     # optional: Do not crash the application immediately if the Config Server is unavailable.
     # configserver: Predefined prefix in Spring Boot.
+    import: optional:configserver:http://config-server:8888
 
   cloud:
     config:
-      discovery:
-        enabled: true   #Enable discovery to find Config Server in Eureka.
-        service-id: config-server
-      name: datasource-db,spring-mvc,kafka,timezone    # Import required config file
-
+      name: datasource-db,spring-mvc,kafka,timezone,redis    # Import required config file
 
 
   #database
@@ -26,30 +23,4 @@ spring:
     driverClassName: "com.mysql.cj.jdbc.Driver"
     username: ${USER_DB_USERNAME}
     password: ${USER_DB_PASSWORD}
-
-  #redis
-  data:
-    redis:
-      host: ${REDIS_HOST:localhost}
-      port: ${REDIS_PORT:6379}
-      password: ${REDIS_PASSWORD:}
-      database: 0
-      timeout: 5000ms
-      lettuce:
-          pool:
-            max-active: 8   # Maximum number of concurrent connections
-            max-idle: 8     # Maximum number of idle connections to keep
-            min-idle: 0     # Minimum number of idle connections.
-
-#Eureka
-eureka:
-  instance:
-    prefer-ip-address: true   # Use IP address instead of hostname
-    instance-id: ${spring.application.name}:${server.port}
-
-  client:
-    service-url:
-      defaultZone: ${EUREKA_SERVER_URL:http://eureka-server:8762/eureka/}
-
-
 

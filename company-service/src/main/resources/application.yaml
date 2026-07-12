@@ -6,16 +6,13 @@ spring:
     name: company-service
 
   config:
-    import: "optional:configserver:"       # use service id
+    import: optional:configserver:http://config-server:8888      # use service id
     #import: "optional:configserver:http://localhost:8888"   #  use localhost
 
 
   # Use the Config Server name registered in Eureka instead of localhost.
   cloud:
     config:
-      discovery:
-        enabled: true   #Enable discovery to find Config Server via Eureka.
-        service-id: config-server
       name: datasource-db,spring-mvc,kafka,timezone    # Import required config file
 
 
@@ -28,14 +25,3 @@ spring:
     username: ${COMPANY_DB_USERNAME}
     password: ${COMPANY_DB_PASSWORD}
 
-
-
-
-#Eureka
-eureka:
-  instance:
-    prefer-ip-address: true   # Use IP address instead of hostname
-    instance-id: ${spring.application.name}:${server.port}
-  client:
-    service-url:
-      defaultZone: http://eureka-server:8762/eureka/

@@ -55,9 +55,6 @@
     networks:
       - recruitment-network
     
-    volumes:
-      - ./logs:/app/logs
-      - ./config-server/src/main/resources/shared:/app/config/shared
 
 
   # =========================
@@ -304,8 +301,6 @@
 
 
 
-
-
   # =========================
   # USER SERVICE
   # =========================
@@ -508,6 +503,8 @@
       - "1111"
 
     environment:
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
       JAVA_TOOL_OPTIONS: "-Xms128m -Xmx256m -XX:+UseG1GC -XX:+UseStringDeduplication"
     
     mem_limit: 256m

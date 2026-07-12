@@ -1,6 +1,5 @@
 package com.tihuz.user_service.service;
 
-
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jose.crypto.MACVerifier;
@@ -10,6 +9,7 @@ import com.tihuz.common.dto.ApiResponse;
 import com.tihuz.common.event.UserEvent;
 import com.tihuz.common.exception.AppException;
 import com.tihuz.common.exception.ErrorCode;
+import com.tihuz.common.redis.BlacklistTokenService;
 import com.tihuz.user_service.Enum.RoleType;
 import com.tihuz.user_service.client.CompanyClient;
 import com.tihuz.user_service.dto.request.AuthenticationRequest;
@@ -22,7 +22,6 @@ import com.tihuz.user_service.entity.User;
 import com.tihuz.user_service.mapper.UserMapper;
 import com.tihuz.user_service.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.ws.rs.POST;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -54,6 +53,9 @@ public class AuthenticationService
     KafkaTemplate<String, Object> kafkaTemplate;
     CompanyClient companyClient;
     HttpServletRequest httpServletRequest;
+    RefreshTokenService refreshTokenService;
+    BlacklistTokenService blacklistTokenService;
+
 
     @NonFinal
     @Value("${jwt.valid-duration}")
@@ -78,10 +80,16 @@ public class AuthenticationService
             throw new AppException(ErrorCode.PASSWORD_INVALID);
         }
 
-        var token=generateToken(user);
+        String accessToken = generateToken(user);
+
+        String refreshToken = generateRefreshToken(user);
+
+        // save redis
+        refreshTokenService.save(user.getId(), refreshToken, REFRESH_DURATION);
 
         return AuthenticationResponse.builder()
-                .token(token)
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
                 .build();
     }
 
@@ -202,9 +210,8 @@ public class AuthenticationService
 
 
 
-
-
-    private String generateToken(User user) throws JOSEException {
+    private String generateToken(User user) throws JOSEException
+    {
          JWSHeader jwsHeader= new JWSHeader(JWSAlgorithm.HS512);
 
          JWTClaimsSet jwtClaimsSet=new JWTClaimsSet.Builder()
@@ -225,29 +232,137 @@ public class AuthenticationService
      }
 
 
-     private SignedJWT verifyToken(String token, boolean isRefresh) throws JOSEException, ParseException {
+     private SignedJWT verifyToken(String token, boolean isRefresh) throws JOSEException, ParseException
+     {
+         // check blacklist
+         if (blacklistTokenService.exists(token))
+         {
+             throw new AppException(ErrorCode.UNAUTHORIZED_EXCEPTION);
+         }
 
         // create verifier token by JWSVerifier
         JWSVerifier verifier=new MACVerifier(SIGNER_KEY.getBytes());
 
         // Parse the token string -> SignedJWT object
         SignedJWT signedJWT=SignedJWT.parse(token);
+        // check sign
+         boolean verified = signedJWT.verify(verifier);
 
-        // get claim expiration
-         Date expiryTime=(isRefresh)
-                 ? new Date(signedJWT.getJWTClaimsSet().getIssueTime()
-                 .toInstant().plus(REFRESH_DURATION,ChronoUnit.SECONDS).toEpochMilli())
-                 : signedJWT.getJWTClaimsSet().getExpirationTime();
+        // check expirationTime
+         Date expirationTime = signedJWT.getJWTClaimsSet().getExpirationTime();
 
-         var verified=signedJWT.verify(verifier); // check sign HMAC
-
-         if(!verified|| expiryTime.before(new Date()))
+         if (!verified || expirationTime.before(new Date()))
+         {
              throw new AppException(ErrorCode.UNAUTHORIZED_EXCEPTION);
+         }
 
+         // if is verify Refresh Token
+         if (isRefresh)
+         {
+             String type = signedJWT.getJWTClaimsSet().getStringClaim("type");
+
+             if (!"refresh".equals(type))
+             {
+                 throw new AppException(ErrorCode.UNAUTHORIZED_EXCEPTION);
+             }
+         }
          return signedJWT;
-
      }
 
+    public AuthenticationResponse refresh(String accessToken, String refreshToken) throws ParseException, JOSEException
+    {
 
+        // Verify refresh token
+        SignedJWT refreshJwt  = verifyToken(refreshToken, true);
+
+        // Get userId from JWT
+        Long userId = Long.valueOf(refreshJwt .getJWTClaimsSet().getSubject());
+
+        // get refresh token in Redis
+        String redisToken = refreshTokenService.get(userId);
+
+        if (redisToken == null || !redisToken.equals(refreshToken))
+        {
+            throw new AppException(ErrorCode.UNAUTHORIZED_EXCEPTION);
+        }
+
+        // Verify old access token
+        SignedJWT accessJwt = verifyToken(accessToken, false);
+
+        // Blacklist old access token
+        Date expiration = accessJwt.getJWTClaimsSet().getExpirationTime();
+
+        long ttl = (expiration.getTime() - System.currentTimeMillis()) / 1000;
+
+        if (ttl > 0)
+        {
+            blacklistTokenService.save(accessToken, ttl);
+        }
+
+
+        // Get user
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_INVALID));
+
+        // generate new token
+        String newAccessToken = generateToken(user);
+        String newRefreshToken = generateRefreshToken(user);
+
+        // Overwrite the refresh token in Redis
+        refreshTokenService.save(userId, newRefreshToken, REFRESH_DURATION);
+
+        return AuthenticationResponse.builder()
+                .accessToken(newAccessToken)
+                .refreshToken(newRefreshToken)
+                .build();
+    }
+
+
+
+    private String generateRefreshToken(User user) throws JOSEException
+    {
+
+        JWSHeader header = new JWSHeader(JWSAlgorithm.HS512);
+
+        JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder()
+                .subject(String.valueOf(user.getId()))
+                .issueTime(new Date())
+                .expirationTime(Date.from(Instant.now().plus(REFRESH_DURATION, ChronoUnit.SECONDS)))
+                .jwtID(UUID.randomUUID().toString())
+                .claim("type","refresh")
+                .build();
+
+        Payload payload= new Payload(jwtClaimsSet.toJSONObject());
+
+        JWSObject jwsObject=new JWSObject(header,payload);
+
+        jwsObject.sign(new MACSigner(SIGNER_KEY.getBytes()));
+
+        return jwsObject.serialize();
+    }
+
+
+    public void logout(String accessToken, String refreshToken) throws ParseException, JOSEException
+    {
+        // verify refresh token
+        SignedJWT refreshJwt = verifyToken(refreshToken, true);
+
+        Long userId = Long.valueOf(refreshJwt.getJWTClaimsSet().getSubject());
+
+        // xóa refresh token
+        refreshTokenService.delete(userId);
+
+        // verify access token
+        SignedJWT accessJwt = verifyToken(accessToken, false);
+
+        Date expiration = accessJwt.getJWTClaimsSet().getExpirationTime();
+
+        long ttl = (expiration.getTime() - System.currentTimeMillis()) / 1000;
+
+        if (ttl > 0)
+        {
+            blacklistTokenService.save(accessToken, ttl);
+        }
+    }
 
 }

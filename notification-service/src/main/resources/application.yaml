@@ -6,15 +6,11 @@ spring:
     name: notification-service
 
   config:
-    import: "optional:configserver:"
+    import: optional:configserver:http://config-server:8888
     # optional: prevent crash if config server unavailable
 
   cloud:
     config:
-      discovery:
-        enabled: true
-        service-id: config-server
-      uri: http://config-server:8888
       name: mail,kafka
 
   mail:
@@ -31,13 +27,6 @@ spring:
             required: true
     default-encoding: UTF-8
 
-eureka:
-  instance:
-    prefer-ip-address: true
-    instance-id: ${spring.application.name}:${server.port}
-  client:
-    service-url:
-      defaultZone: http://eureka-server:8762/eureka/
 
 logging:
   level:

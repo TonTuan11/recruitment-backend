@@ -6,10 +6,12 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication(scanBasePackages = {
         "com.tihuz.gateway_service",
         "com.tihuz.common.dto",
-        "com.tihuz.common.exception"
+        "com.tihuz.common.exception",
+        "com.tihuz.common.redis"
 })
 
-public class GatewayServiceApplication {
+public class GatewayServiceApplication
+{
 
 	public static void main(String[] args) {
 

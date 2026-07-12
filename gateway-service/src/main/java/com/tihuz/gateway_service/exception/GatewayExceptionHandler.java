@@ -41,6 +41,7 @@ public class GatewayExceptionHandler implements ErrorWebExceptionHandler {
 
         log.error("===> MESSAGE ERROR: {}", ex.getMessage());
         log.error("===> CLASS: {}", ex.getClass().getName());
+        log.error("Gateway exception", ex);
 
 
         // Convert exception -> ErrorCode

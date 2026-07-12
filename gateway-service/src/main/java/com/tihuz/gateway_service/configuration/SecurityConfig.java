@@ -1,11 +1,14 @@
 package com.tihuz.gateway_service.configuration;
 
+import com.tihuz.common.redis.BlacklistTokenService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
+import org.springframework.security.oauth2.core.OAuth2Error;
+import org.springframework.security.oauth2.core.OAuth2TokenValidatorResult;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.security.oauth2.jwt.NimbusReactiveJwtDecoder;
 import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder;
@@ -71,11 +74,36 @@ public class SecurityConfig {
 
 
     @Bean
-    public ReactiveJwtDecoder jwtDecoder()
+    public ReactiveJwtDecoder jwtDecoder(BlacklistTokenService blacklistTokenService)
     {
-        SecretKeySpec spec=new SecretKeySpec(SIGNER_KEY.getBytes(),"HS512");
-        return NimbusReactiveJwtDecoder.withSecretKey(spec)
+        SecretKeySpec spec = new SecretKeySpec(SIGNER_KEY.getBytes(), "HS512");
+
+        NimbusReactiveJwtDecoder decoder = NimbusReactiveJwtDecoder.withSecretKey(spec)
                 .macAlgorithm(MacAlgorithm.HS512)
                 .build();
+
+        decoder.setJwtValidator(jwt ->
+        {
+
+            if (blacklistTokenService.exists(jwt.getTokenValue()))
+            {
+                return OAuth2TokenValidatorResult.failure(
+                        new OAuth2Error("invalid_token")
+                );
+            }
+
+            String type= jwt.getClaimAsString("type");
+            if("refresh".equals(type))
+            {
+                return OAuth2TokenValidatorResult.failure(
+                        new OAuth2Error("invalid_token"));
+
+            }
+
+            return OAuth2TokenValidatorResult.success();
+        });
+
+        return decoder;
+
     }
 }

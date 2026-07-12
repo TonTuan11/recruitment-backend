@@ -14,21 +14,11 @@ spring:
     config:
       server:
         native:
-          #search-locations: classpath:/shared # Common configuration files directory (src/main/resources/shared)
-          search-locations: file:/app/config/shared
-
+          #search-locations: classpath:/shared # Common configuration files directory (src/main/resources/shared) # config sẽ được đọc trong file jar
+          search-locations: file:/app/config/shared  # config lưu vào config/shared (thư mục trong docker) chứ ko lưu trong jar nhưng vẫn build lại image ( nếu có volume thì chỉ cần restart)
 
         overrides:
           jwt.signerKey: ${JWT_SIGNER_KEY}
           jwt.valid-duration: ${JWT_VALID_DURATION}
           jwt.refreshable-duration: ${JWT_REFRESH_DURATION}
 
-#Eureka
-eureka:
-  instance:
-    prefer-ip-address: true   # Use IP address instead of hostname
-    instance-id: ${spring.application.name}:${server.port}
-  client:
-    service-url:
-      #defaultZone: http://localhost:8762/eureka/   # register on Eureka
-      defaultZone: ${EUREKA_SERVER_URL:http://eureka-server:8762/eureka/}  # using Docker containers

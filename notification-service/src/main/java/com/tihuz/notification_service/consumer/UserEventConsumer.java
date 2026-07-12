@@ -2,6 +2,8 @@ package com.tihuz.notification_service.consumer;
 
 import com.tihuz.common.event.UserEvent;
 import com.tihuz.notification_service.service.EmailService;
+import lombok.AllArgsConstructor;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -12,7 +14,6 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class UserEventConsumer
 {
-
     private final EmailService emailService;
 
     @KafkaListener(topics = UserEvent.TOPIC, groupId = "notification-service-group")

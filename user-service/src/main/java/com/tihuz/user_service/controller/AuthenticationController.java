@@ -3,10 +3,7 @@ package com.tihuz.user_service.controller;
 
 import com.nimbusds.jose.JOSEException;
 import com.tihuz.common.dto.ApiResponse;
-import com.tihuz.user_service.dto.request.AuthenticationRequest;
-import com.tihuz.user_service.dto.request.ForgetPasswordRequest;
-import com.tihuz.user_service.dto.request.ResetPasswordRequest;
-import com.tihuz.user_service.dto.request.UserCreatedRequest;
+import com.tihuz.user_service.dto.request.*;
 import com.tihuz.user_service.dto.response.AuthenticationResponse;
 import com.tihuz.user_service.dto.response.UserResponse;
 import com.tihuz.user_service.service.AuthenticationService;
@@ -19,6 +16,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.text.ParseException;
 
 @RestController
 @RequestMapping("/auth")
@@ -46,6 +45,15 @@ public class AuthenticationController
                 .build();
     }
 
+    @PostMapping("/refresh-token")
+    public ApiResponse<AuthenticationResponse> refreshToken(@RequestBody @Valid RefreshRequest request) throws ParseException, JOSEException
+    {
+        return ApiResponse.<AuthenticationResponse>builder()
+                .result(authenticationService.refresh(request.getAccessToken(),request.getRefreshToken()))
+                .build();
+
+    }
+
     @PostMapping("/forgot-password")
     public ApiResponse<String> forgotPassword(@RequestBody @Valid ForgetPasswordRequest request)
     {
@@ -61,6 +69,17 @@ public class AuthenticationController
         userService.resetPassword(request.getEmail(), request.getOtp(), request.getNewPassword());
         return ApiResponse.<String>builder()
                 .message("Password reset successfully")
+                .build();
+    }
+
+    @PostMapping("/logout")
+    public ApiResponse<Void> logout(@RequestBody LogoutRequest request)
+            throws ParseException, JOSEException {
+
+        authenticationService.logout(request.getAccessToken(),request.getRefreshToken());
+
+        return ApiResponse.<Void>builder()
+                .message("Logout successfully")
                 .build();
     }
 

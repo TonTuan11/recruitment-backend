@@ -12,7 +12,8 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtGra
 import javax.crypto.spec.SecretKeySpec;
 
 @Configuration
-public class CommonSecurityConfig {
+public class CommonSecurityConfig
+{
 
     @Value("${jwt.signerKey}")
     private String SIGNER_KEY;

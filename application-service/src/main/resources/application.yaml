@@ -6,16 +6,13 @@ spring:
     name: application-service
 
   config:
-    import: "optional:configserver:"  # use service id
+    import: optional:configserver:http://config-server:8888
    #import: "optional:configserver:http://localhost:8888"   #   use localhost
 
 
   #config-server
   cloud:
     config:
-      discovery:
-        enabled: true   #Enable discovery to find Config Server in Eureka.
-        service-id: config-server
       name: spring-mvc,datasource-db,kafka,timezone
 
     openfeign:
@@ -30,16 +27,6 @@ spring:
     username: ${APPLICATION_DB_USERNAME}
     password: ${APPLICATION_DB_PASSWORD}
 
-
-#Eureka
-eureka:
-  instance:
-    prefer-ip-address: true   # Use IP address instead of hostname
-    instance-id: ${spring.application.name}:${server.port}
-  client:
-    service-url:
-      #defaultZone: http://localhost:8762/eureka/   # register on Eureka
-      defaultZone: http://eureka-server:8762/eureka/   # using docker container
 
 
 #fallback
