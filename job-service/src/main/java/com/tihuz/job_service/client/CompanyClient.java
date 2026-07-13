@@ -17,7 +17,7 @@ public interface CompanyClient {
 
     @GetMapping("/companies/{id}")
     ApiResponse<CompanyResponse> getCompanyNameById(
-            @RequestHeader("Authorization") String token,
+
             @PathVariable("id") Long companyId
     );
 }

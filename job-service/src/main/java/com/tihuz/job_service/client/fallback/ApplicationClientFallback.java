@@ -20,7 +20,8 @@ public class ApplicationClientFallback implements ApplicationClient {
     }
 
     @Override
-    public ApiResponse<Void> deleteApplicationsByJobId(Long jobId, String token) {
+    public ApiResponse<Void> deleteApplicationsByJobId(Long jobId)
+    {
         log.error("Fallback: Cannot delete applications for job {}", jobId);
         return ApiResponse.<Void>builder()
                 .code(404)

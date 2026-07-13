@@ -19,7 +19,8 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 @Slf4j
 @ControllerAdvice
 @Getter
-public class GlobalExceptionHandler {
+public class GlobalExceptionHandler
+{
 
     //500
     @ExceptionHandler(value = RuntimeException.class)

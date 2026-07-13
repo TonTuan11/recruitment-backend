@@ -8,7 +8,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 @FeignClient(name = "JOB-SERVICE", fallback = JobClientFallback.class)
-public interface JobClient {
+public interface JobClient
+{
 
     // SỬA: Thêm ApiResponse wrapper
     @GetMapping("/jobs/user/{id}")

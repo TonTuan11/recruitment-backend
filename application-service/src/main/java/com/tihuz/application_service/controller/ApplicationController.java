@@ -46,8 +46,7 @@ public class ApplicationController {
 
     @GetMapping("/{id}")
     @PreAuthorize("isAuthenticated()")
-    public ApiResponse<ApplicationResponse> getApplicationById(
-            @PathVariable Long id)
+    public ApiResponse<ApplicationResponse> getApplicationById(@PathVariable Long id)
     {
         return ApiResponse.<ApplicationResponse>builder()
                 .result(applicationService.getApplicationById(id))
@@ -212,7 +211,8 @@ public class ApplicationController {
 
     @DeleteMapping("/by-job/{jobId}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ApiResponse<Void> deleteApplicationsByJobId(@PathVariable Long jobId) {
+    public ApiResponse<Void> deleteApplicationsByJobId(@PathVariable Long jobId)
+    {
         applicationService.deleteApplicationsByJobId(jobId);
         return ApiResponse.<Void>builder()
                 .message("Deleted all applications for job " + jobId)

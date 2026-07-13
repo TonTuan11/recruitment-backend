@@ -15,8 +15,7 @@ public interface ApplicationClient {
             @RequestHeader("Authorization") String authorization);
 
     @DeleteMapping("/applications/by-job/{jobId}")
-    ApiResponse<Void> deleteApplicationsByJobId(@PathVariable("jobId") Long jobId,
-                                                @RequestHeader("Authorization") String token);
+    ApiResponse<Void> deleteApplicationsByJobId(@PathVariable("jobId") Long jobId);
 
 
 }

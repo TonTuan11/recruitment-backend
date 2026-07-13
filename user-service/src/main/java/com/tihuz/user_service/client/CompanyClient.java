@@ -14,13 +14,8 @@ import org.springframework.web.bind.annotation.*;
 public interface CompanyClient
 {
     @PostMapping("/companies")
-    ApiResponse<CompanyResponse> createCompany(
-            @RequestHeader("Authorization") String token,
-            @RequestBody CompanyRequest request);
+    ApiResponse<CompanyResponse> createCompany(@RequestBody CompanyRequest request);
 
     @GetMapping("/companies/{id}")
-    ApiResponse<CompanyResponse> getCompanyNameById(
-            @RequestHeader("Authorization") String token,
-            @PathVariable("id") Long companyId
-    );
+    ApiResponse<CompanyResponse> getCompanyNameById(@PathVariable("id") Long companyId);
 }

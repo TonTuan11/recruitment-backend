@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class CompanyClientFallback implements CompanyClient {
     @Override
-    public ApiResponse<CompanyResponse> getCompanyNameById(String token, Long companyId) {
+    public ApiResponse<CompanyResponse> getCompanyNameById( Long companyId) {
         log.warn("Fallback COMPANY SERVICE called for companyId: {}", companyId);
 
         CompanyResponse companyResponse = CompanyResponse.builder()

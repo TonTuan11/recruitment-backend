@@ -10,10 +10,9 @@ import org.springframework.web.bind.annotation.*;
         name = "USER-SERVICE",
         fallback = UserClientFallback.class
 )
-public interface UserClient {
+public interface UserClient
+{
 
     @GetMapping("/users/{id}")
-    ApiResponse<UserResponse> getUserById(
-            @PathVariable("id") Long userId
-    );
+    ApiResponse<UserResponse> getUserById(@PathVariable("id") Long userId);
 }

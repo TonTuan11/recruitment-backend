@@ -39,11 +39,14 @@ public class UserController {
     {
 
 
-        try {
+        try
+        {
             String token = httpServletRequest.getHeader("Authorization");
-            ApiResponse<CompanyResponse> response = companyClient.getCompanyNameById(token, 1L);
+            ApiResponse<CompanyResponse> response = companyClient.getCompanyNameById( 1L);
             return response;
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             e.printStackTrace();
             return ApiResponse.<CompanyResponse>builder()
                     .code(500)

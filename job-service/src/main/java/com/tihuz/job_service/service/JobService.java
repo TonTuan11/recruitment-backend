@@ -49,23 +49,25 @@ public class JobService {
     CompanyClient companyClient;
     ApplicationClient applicationClient;
     KafkaTemplate<String, Object> kafkaTemplate;
-    HttpServletRequest httpServletRequest;
 
-    public JobResponse createJob(JobCreateRequest request) {
+
+    public JobResponse createJob(JobCreateRequest request)
+    {
         var authentication = SecurityContextHolder.getContext().getAuthentication();
         Long userId = Long.valueOf(authentication.getName());
 
-        String token = httpServletRequest.getHeader("Authorization");
+
 
         if (request.getExpiredAt() != null && request.getExpiredAt().isBefore(LocalDateTime.now()))
         {
             throw new AppException(ErrorCode.EXPIRED_DATE_INVALID);
         }
 
-        ApiResponse<UserResponse> userResponse = userClient.getUserById(token, userId);
+        ApiResponse<UserResponse> userResponse = userClient.getUserById( userId);
         UserResponse user = userResponse.getResult();
         Long companyId = user.getCompanyId();
-        if (companyId == null) {
+        if (companyId == null)
+        {
             throw new AppException(ErrorCode.COMPANY_NOT_FOUND);
         }
 
@@ -239,7 +241,8 @@ public class JobService {
     }
 
 
-    public Page<JobResponse> getJobPaged(int page, int size, String keyword, String location, String experience, String category, String jobType, Long companyId, Long userId) {
+    public Page<JobResponse> getJobPaged(int page, int size, String keyword, String location, String experience, String category, String jobType, Long companyId, Long userId)
+    {
 
 
         Pageable pageable = PageRequest.of(page, size);
@@ -261,7 +264,8 @@ public class JobService {
 //        });
 
 
-        return jobs.map(job -> {
+        return jobs.map(job ->
+        {
             JobResponse response = jobMapper.toJobResponse(job);
 
             ApiResponse<CompanyResponse> companyResp = getCompanyName(job.getCompanyId());
@@ -323,23 +327,31 @@ public class JobService {
 //    }
 
 
-    public ApiResponse<CompanyResponse> getCompanyName(Long companyId) {
-        if (companyId == null || companyId <= 0) {
+    public ApiResponse<CompanyResponse> getCompanyName(Long companyId)
+    {
+        if (companyId == null || companyId <= 0)
+        {
             throw new AppException(ErrorCode.COMPANY_NOT_FOUND);
         }
 
-        try {
-            String token = httpServletRequest.getHeader("Authorization");
-            return companyClient.getCompanyNameById(token, companyId);
-        } catch (FeignException.NotFound e) {
+        try
+        {
+
+            return companyClient.getCompanyNameById( companyId);
+        }
+        catch (FeignException.NotFound e)
+        {
             throw new AppException(ErrorCode.COMPANY_NOT_FOUND);
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             throw new AppException(ErrorCode.COMPANY_SERVICE_ERROR);
         }
     }
 
 
-    public List<JobResponse> getRelatedJobs(Long jobId) {
+    public List<JobResponse> getRelatedJobs(Long jobId)
+    {
         Job currentJob = jobRepository.findByIdAndIsDeletedFalse(jobId)
                 .orElseThrow(() -> new AppException(ErrorCode.JOB_NOT_FOUND));
 
@@ -355,15 +367,21 @@ public class JobService {
                 // Convert job sang response
                 JobResponse response = jobMapper.toJobResponse(job);
 
-                try {
+                try
+                {
                     ApiResponse<CompanyResponse> companyResp = getCompanyName(job.getCompanyId());
-                    if (companyResp != null && companyResp.getResult() != null) {
+                    if (companyResp != null && companyResp.getResult() != null)
+                    {
                         response.setCompanyName(companyResp.getResult().getName());
                         response.setCompanyLogo(companyResp.getResult().getLogo());
-                    } else {
+                    }
+                    else
+                    {
                         response.setCompanyName("Unknown Company");
                     }
-                } catch (Exception e) {
+                }
+                catch (Exception e)
+                {
                     response.setCompanyName("Unknown Company");
                 }
 
@@ -509,21 +527,24 @@ public class JobService {
     }
 
 
-    public void hardDeleteJob(Long id) {
+    public void hardDeleteJob(Long id)
+    {
         var job = jobRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.JOB_NOT_FOUND));
 
-        String token = httpServletRequest.getHeader("Authorization");
-        // xóa application trước
-        try {
-            applicationClient.deleteApplicationsByJobId(id,token);
+        // delete application trước
+        try
+        {
+            applicationClient.deleteApplicationsByJobId(id);
             log.info("Deleted all applications for job {}", id);
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             log.error("Failed to delete applications for job {}", id, e);
             throw new AppException(ErrorCode.CANNOT_DELETE_JOB);
         }
 
-        // xóa job
+        // delete job
         jobRepository.deleteById(job.getId());
         log.info("Job {} has been hard deleted by admin", id);
 

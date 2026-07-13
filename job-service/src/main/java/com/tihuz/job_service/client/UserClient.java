@@ -13,9 +13,6 @@ import org.springframework.web.bind.annotation.RequestHeader;
 fallback = UserClientFallback.class)
 public interface UserClient {
     @GetMapping("/users/{id}")
-    ApiResponse<UserResponse> getUserById(
-            @RequestHeader("Authorization") String token,
-            @PathVariable("id") Long userId
-    );
+    ApiResponse<UserResponse> getUserById(@PathVariable("id") Long userId);
 
 }

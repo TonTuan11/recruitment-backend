@@ -126,12 +126,6 @@
             <artifactId>resilience4j-micrometer</artifactId>
         </dependency>
 
-        <!--Dependency cho Feign (Chỉ Service nào dùng Feign mới cần)-->
-        <dependency>
-            <groupId>io.github.openfeign</groupId>
-            <artifactId>feign-micrometer</artifactId>
-        </dependency>
-
 
         <!-- Actuator: cung cấp metrics, health check và kích hoạt tracing (Micrometer/Zipkin) -->
         <dependency>

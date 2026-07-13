@@ -55,7 +55,8 @@ public class CompanyController {
     }
 
     @GetMapping("/{id}")
-    public ApiResponse<CompanyResponse> getCompanyById(@PathVariable Long id) {
+    public ApiResponse<CompanyResponse> getCompanyById(@PathVariable Long id)
+    {
         return ApiResponse.<CompanyResponse>builder()
                 .result(companyService.getCompanyById(id))
                 .build();

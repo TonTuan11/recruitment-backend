@@ -9,12 +9,14 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-public class CompanyClientFallback implements CompanyClient {
+public class CompanyClientFallback implements CompanyClient
+{
 
 
 
     @Override
-    public ApiResponse<CompanyResponse> createCompany(String token, CompanyRequest request) {
+    public ApiResponse<CompanyResponse> createCompany( CompanyRequest request)
+    {
         log.error("Fallback: Company service is down or error when creating company: {}", request.getName());
 
         // Trả về response mặc định báo lỗi
@@ -25,7 +27,8 @@ public class CompanyClientFallback implements CompanyClient {
     }
 
     @Override
-    public ApiResponse<CompanyResponse> getCompanyNameById(String token, Long companyId) {
+    public ApiResponse<CompanyResponse> getCompanyNameById( Long companyId)
+    {
         log.warn("Fallback COMPANY SERVICE called for companyId: {}", companyId);
 
         CompanyResponse companyResponse = CompanyResponse.builder()

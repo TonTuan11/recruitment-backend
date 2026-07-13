@@ -11,7 +11,8 @@ import org.springframework.stereotype.Component;
 public class UserClientFallback implements UserClient {
 
     @Override
-    public ApiResponse<UserResponse> getUserById(String token, Long userId) {
+    public ApiResponse<UserResponse> getUserById( Long userId)
+    {
         log.warn("Fallback USER SERVICE userId={}", userId);
         UserResponse user = UserResponse.builder()
                 .id(-1L)

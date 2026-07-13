@@ -81,7 +81,6 @@ public enum ErrorCode {
 
     ACCESS_DENIED(1011, "You do not have permission", HttpStatus.FORBIDDEN),
 
-
     ;
 
 

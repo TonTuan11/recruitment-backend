@@ -52,7 +52,7 @@ public class AuthenticationService
     UserMapper userMapper;
     KafkaTemplate<String, Object> kafkaTemplate;
     CompanyClient companyClient;
-    HttpServletRequest httpServletRequest;
+
     RefreshTokenService refreshTokenService;
     BlacklistTokenService blacklistTokenService;
 
@@ -163,8 +163,8 @@ public class AuthenticationService
                         .email(request.getEmail())
                         .build();
 
-                String token = httpServletRequest.getHeader("Authorization");
-                ApiResponse<CompanyResponse> response = companyClient.createCompany(token,companyRequest);
+//                String token = httpServletRequest.getHeader("Authorization");
+                ApiResponse<CompanyResponse> response = companyClient.createCompany(companyRequest);
 
                 // Check response from fallback or error
                 if (response == null || response.getResult() == null || response.getCode() != 200)

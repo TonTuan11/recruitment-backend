@@ -183,7 +183,8 @@ public class JobController {
 
 
     @GetMapping("/company-name/{companyId}")
-    public ApiResponse<CompanyResponse> testGetCompanyName(@PathVariable Long companyId) {
+    public ApiResponse<CompanyResponse> testGetCompanyName(@PathVariable Long companyId)
+    {
 
         return jobService.getCompanyName(companyId);
 
