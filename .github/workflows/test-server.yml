@@ -26,6 +26,14 @@ jobs:
           path: recruitment-frontend
 
       # =========================
+      # INSTALL COMMON LIB
+      # =========================
+      - name: Install common-lib
+        working-directory: recruitment-backend/common-lib
+        run: |
+          mvn clean install -DskipTests
+
+      # =========================
       # BUILD MAVEN SERVICES
       # =========================
       - name: Build Maven services
