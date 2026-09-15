@@ -283,7 +283,8 @@
     # =========================
   minio:
     container_name: minio
-    image: minio/minio
+    #image: minio/minio
+    image: quay.io/minio/minio
     command: server /data --console-address ":9001"
 
     expose:
