@@ -8,13 +8,76 @@ jobs:
     runs-on: self-hosted
 
     steps:
-      - name: Checkout code
+      - name: Checkout backend
         uses: actions/checkout@v4
+        with:
+          path: recruitment-backend
 
-      - name: Check server
+      - name: Checkout frontend
+        uses: actions/checkout@v4
+        with:
+          repository: TonTuan11/recruitment-frontend
+          path: recruitment-frontend
+
+      - name: Create .env
+        working-directory: recruitment-backend
+        env:
+          APPLICATION_DB_PASSWORD: ${{ secrets.APPLICATION_DB_PASSWORD }}
+          APPLICATION_DB_USERNAME: ${{ secrets.APPLICATION_DB_USERNAME }}
+          COMPANY_DB_PASSWORD: ${{ secrets.COMPANY_DB_PASSWORD }}
+          COMPANY_DB_USERNAME: ${{ secrets.COMPANY_DB_USERNAME }}
+          JOB_DB_PASSWORD: ${{ secrets.JOB_DB_PASSWORD }}
+          JOB_DB_USERNAME: ${{ secrets.JOB_DB_USERNAME }}
+          JWT_REFRESH_DURATION: ${{ secrets.JWT_REFRESH_DURATION }}
+          JWT_SIGNER_KEY: ${{ secrets.JWT_SIGNER_KEY }}
+          JWT_VALID_DURATION: ${{ secrets.JWT_VALID_DURATION }}
+          MAIL_PASSWORD: ${{ secrets.MAIL_PASSWORD }}
+          MAIL_USERNAME: ${{ secrets.MAIL_USERNAME }}
+          MINIO_ACCESS_KEY: ${{ secrets.MINIO_ACCESS_KEY }}
+          MINIO_BUCKET: ${{ secrets.MINIO_BUCKET }}
+          MINIO_SECRET_KEY: ${{ secrets.MINIO_SECRET_KEY }}
+          MYSQL_APPLICATION_ROOT_PASSWORD: ${{ secrets.MYSQL_APPLICATION_ROOT_PASSWORD }}
+          MYSQL_COMPANY_ROOT_PASSWORD: ${{ secrets.MYSQL_COMPANY_ROOT_PASSWORD }}
+          MYSQL_JOB_ROOT_PASSWORD: ${{ secrets.MYSQL_JOB_ROOT_PASSWORD }}
+          MYSQL_USER_ROOT_PASSWORD: ${{ secrets.MYSQL_USER_ROOT_PASSWORD }}
+          REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
+          TUNNEL_TOKEN: ${{ secrets.TUNNEL_TOKEN }}
+          USER_DB_HOST: ${{ secrets.USER_DB_HOST }}
+          USER_DB_PASSWORD: ${{ secrets.USER_DB_PASSWORD }}
+          USER_DB_PORT: ${{ secrets.USER_DB_PORT }}
+          USER_DB_USERNAME: ${{ secrets.USER_DB_USERNAME }}
+
         run: |
-          echo "Running on Ubuntu production server"
-          whoami
-          hostname
-          docker --version
-          docker compose version
+          cat > .env <<EOF
+          APPLICATION_DB_PASSWORD=$APPLICATION_DB_PASSWORD
+          APPLICATION_DB_USERNAME=$APPLICATION_DB_USERNAME
+          COMPANY_DB_PASSWORD=$COMPANY_DB_PASSWORD
+          COMPANY_DB_USERNAME=$COMPANY_DB_USERNAME
+          JOB_DB_PASSWORD=$JOB_DB_PASSWORD
+          JOB_DB_USERNAME=$JOB_DB_USERNAME
+          JWT_REFRESH_DURATION=$JWT_REFRESH_DURATION
+          JWT_SIGNER_KEY=$JWT_SIGNER_KEY
+          JWT_VALID_DURATION=$JWT_VALID_DURATION
+          MAIL_PASSWORD=$MAIL_PASSWORD
+          MAIL_USERNAME=$MAIL_USERNAME
+          MINIO_ACCESS_KEY=$MINIO_ACCESS_KEY
+          MINIO_BUCKET=$MINIO_BUCKET
+          MINIO_SECRET_KEY=$MINIO_SECRET_KEY
+          MYSQL_APPLICATION_ROOT_PASSWORD=$MYSQL_APPLICATION_ROOT_PASSWORD
+          MYSQL_COMPANY_ROOT_PASSWORD=$MYSQL_COMPANY_ROOT_PASSWORD
+          MYSQL_JOB_ROOT_PASSWORD=$MYSQL_JOB_ROOT_PASSWORD
+          MYSQL_USER_ROOT_PASSWORD=$MYSQL_USER_ROOT_PASSWORD
+          REDIS_PASSWORD=$REDIS_PASSWORD
+          TUNNEL_TOKEN=$TUNNEL_TOKEN
+          USER_DB_HOST=$USER_DB_HOST
+          USER_DB_PASSWORD=$USER_DB_PASSWORD
+          USER_DB_PORT=$USER_DB_PORT
+          USER_DB_USERNAME=$USER_DB_USERNAME
+          EOF
+
+          chmod 600 .env
+
+      - name: Deploy
+        working-directory: recruitment-backend
+        run: |
+          docker compose -f docker-compose.prod.yml up -d --build

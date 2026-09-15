@@ -10,7 +10,8 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class PasswordResetEventConsumer {
+public class PasswordResetEventConsumer
+{
 
     private final EmailService emailService;
 

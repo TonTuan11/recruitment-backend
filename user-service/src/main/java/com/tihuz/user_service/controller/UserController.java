@@ -14,20 +14,25 @@ import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
+
 import org.slf4j.MDC;
 
 @RequestMapping("/users")
 @RestController
 @FieldDefaults(level = AccessLevel.PRIVATE,makeFinal = true)
 @RequiredArgsConstructor
-
+@Slf4j
 public class UserController {
     UserService userService;
     CompanyClient companyClient;
@@ -37,8 +42,6 @@ public class UserController {
     @GetMapping("/test-company")
     public ApiResponse<CompanyResponse> testCreateCompany()
     {
-
-
         try
         {
             String token = httpServletRequest.getHeader("Authorization");
@@ -55,6 +58,19 @@ public class UserController {
         }
     }
 
+    private final AtomicLong counter = new AtomicLong();
+
+    @GetMapping("/test-instance")
+    public String testInstance()
+    {
+        return """
+                INSTANCE : %s
+                REQUESTS : %d
+                """.formatted(
+                System.getenv("HOSTNAME"),
+                counter.incrementAndGet()
+        );
+    }
 
 
     @GetMapping("/test")
@@ -114,9 +130,12 @@ public class UserController {
 
     //@PreAuthorize("hasRole('ADMIN') or hasRole('COMPANY') or #userId.toString() == authentication.name")
     @GetMapping("/{userId}")
-    public ApiResponse<UserResponse> getUserId(@PathVariable Long userId)
-    {
+    public ApiResponse<UserResponse> getUserId(@PathVariable Long userId) throws UnknownHostException {
 
+        log.info("=================================================");
+        log.info("INSTANCE: {}", InetAddress.getLocalHost().getHostName());
+        log.info("REQUEST: GET /users/{}", userId);
+        log.info("=================================================");
         return ApiResponse.<UserResponse>builder()
                 .result( userService.getUserId(userId))
                 .build();

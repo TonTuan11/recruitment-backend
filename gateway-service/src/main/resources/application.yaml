@@ -19,7 +19,7 @@ spring:
           routes:
             - id: user-service-route
               uri: lb://USER-SERVICE
-              predicates:
+              predicates: 
                 - Path=/api/auth/**,/api/users/**
               filters:
                 - StripPrefix=1

@@ -3,7 +3,8 @@
 eureka:
   instance:
     prefer-ip-address: true   # Use IP address instead of hostname
-    instance-id: ${spring.application.name}:${server.port}
+#    instance-id: ${spring.application.name}:${server.port}
+    instance-id: ${HOSTNAME}
   client:
     service-url:
       #defaultZone: http://localhost:8762/eureka/   # register on Eureka
