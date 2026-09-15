@@ -8,17 +8,34 @@ jobs:
     runs-on: self-hosted
 
     steps:
+      # =========================
+      # CHECKOUT BACKEND
+      # =========================
       - name: Checkout backend
         uses: actions/checkout@v4
         with:
           path: recruitment-backend
 
+      # =========================
+      # CHECKOUT FRONTEND
+      # =========================
       - name: Checkout frontend
         uses: actions/checkout@v4
         with:
           repository: TonTuan11/recruitment-frontend
           path: recruitment-frontend
 
+      # =========================
+      # BUILD MAVEN
+      # =========================
+      - name: Build all Maven services
+        working-directory: recruitment-backend
+        run: |
+          mvn clean package -DskipTests
+
+      # =========================
+      # CREATE .ENV
+      # =========================
       - name: Create .env
         working-directory: recruitment-backend
         env:
@@ -77,6 +94,9 @@ jobs:
 
           chmod 600 .env
 
+      # =========================
+      # DEPLOY
+      # =========================
       - name: Deploy
         working-directory: recruitment-backend
         run: |
