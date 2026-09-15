@@ -26,12 +26,20 @@ jobs:
           path: recruitment-frontend
 
       # =========================
-      # BUILD MAVEN
+      # BUILD MAVEN SERVICES
       # =========================
-      - name: Build all Maven services
+      - name: Build Maven services
         working-directory: recruitment-backend
         run: |
-          mvn clean package -DskipTests
+          mvn -f discovery-service/pom.xml clean package -DskipTests
+          mvn -f config-server/pom.xml clean package -DskipTests
+          mvn -f user-service/pom.xml clean package -DskipTests
+          mvn -f job-service/pom.xml clean package -DskipTests
+          mvn -f application-service/pom.xml clean package -DskipTests
+          mvn -f company-service/pom.xml clean package -DskipTests
+          mvn -f media-service/pom.xml clean package -DskipTests
+          mvn -f notification-service/pom.xml clean package -DskipTests
+          mvn -f gateway-service/pom.xml clean package -DskipTests
 
       # =========================
       # CREATE .ENV
